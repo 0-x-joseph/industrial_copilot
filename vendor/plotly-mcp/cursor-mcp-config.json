@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "plotly-mcp": {
+      "command": "python",
+      "args": ["/Users/arshad/Desktop/personal/code/plotly-mcp-claude/src/server.py"],
+      "env": {
+        "PYTHONPATH": "/Users/arshad/Desktop/personal/code/plotly-mcp-claude/src"
+      }
+    }
+  }
+}

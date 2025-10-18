@@ -1,0 +1,19 @@
+# MCP Python SDK (current version)
+mcp>=1.2.0
+
+# Plotly for visualization
+plotly>=5.0.0
+
+# Data handling
+pandas>=2.0.0
+
+# HTTP requests for web APIs
+httpx>=0.25.0
+
+# Template engine
+jinja2>=3.0.0
+
+# Development tools
+uvicorn>=0.20.0
+pydantic>=2.0.0
+typing-extensions>=4.0.0
