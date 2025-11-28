@@ -15,7 +15,7 @@ Real-time insights and KPI visualization depend on reliable server availability.
 
 ##### • Limitation:
 The SDK is designed for server interactions and does not support offline operations.
-##### • Impact on Industrial Copilot:
+##### • Impact  Ionndustrial Copilot:
 If the server connection is lost, the dashboard will not be able to fetch or update data, affecting real-time insights.
 ##### • Mitigation:
  • Cache critical data locally in the dashboard to provide limited offline functionality.

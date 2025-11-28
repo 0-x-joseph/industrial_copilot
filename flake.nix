@@ -20,6 +20,7 @@
             buildInputs = [
               (python.withPackages (ps: with ps; [
                 dash		# Dash web framework
+				nodejs_22
                 plotly		# Plotly for graphing
                 pandas		# Data handling
                 uvicorn		#Development server
@@ -31,6 +32,18 @@
 				]))
 				pkgs.python311Packages.pip
             ];
+           # Custom banner
+			shellHook = ''
+              # Clear the default direnv noise
+              clear
+              echo ""
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo "🐍  Welcome to the OCP Development Environment"
+              echo "📁  Directory: $(basename $(pwd))"
+              echo "💡  Environment: Nix + Direnv + Fish"
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo ""
+            '';
             # Optionally, set environment variables here
             # PYTHONPATH = ./.;
           };
