@@ -43,7 +43,7 @@ NIX_ENFORCE_NO_NATIVE='1'
 export NIX_ENFORCE_NO_NATIVE
 NIX_HARDENING_ENABLE='bindnow format fortify fortify3 pic relro stackprotector strictoverflow'
 export NIX_HARDENING_ENABLE
-NIX_LDFLAGS='-rpath /home/_hippo/dev/OCP/outputs/out/lib  -L/nix/store/axqzcg1fls5jcm76h05r2fbpj8m8vzv9-python3-3.11.10-env/lib -L/nix/store/s0p1kr5mvs0j42dq5r08kgqbi0k028f2-python3-3.11.10/lib -L/nix/store/axqzcg1fls5jcm76h05r2fbpj8m8vzv9-python3-3.11.10-env/lib -L/nix/store/s0p1kr5mvs0j42dq5r08kgqbi0k028f2-python3-3.11.10/lib'
+NIX_LDFLAGS='-rpath /home/_hippo/dev/ocp/outputs/out/lib  -L/nix/store/axqzcg1fls5jcm76h05r2fbpj8m8vzv9-python3-3.11.10-env/lib -L/nix/store/s0p1kr5mvs0j42dq5r08kgqbi0k028f2-python3-3.11.10/lib -L/nix/store/axqzcg1fls5jcm76h05r2fbpj8m8vzv9-python3-3.11.10-env/lib -L/nix/store/s0p1kr5mvs0j42dq5r08kgqbi0k028f2-python3-3.11.10/lib'
 export NIX_LDFLAGS
 NIX_NO_SELF_RPATH='1'
 NIX_STORE='/nix/store'
