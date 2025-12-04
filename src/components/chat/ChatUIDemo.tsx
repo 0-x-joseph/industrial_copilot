@@ -772,7 +772,7 @@ export const ChatUIDemo: React.FC = () => {
   };
 
   const handleWorkspace = () => {
-    alert('Workspace navigation functionality will be implemented here');
+    window.location.href = '/workspace';
   };
 
   const handleSidebarCollapse = () => {
