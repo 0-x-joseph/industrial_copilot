@@ -21,6 +21,7 @@ interface Message {
 
 interface ChatState {
   currentSession: OCPSession | null;
+  sessions: OCPSession[];  // List of all available sessions
   messages: OCPMessage[];
   isTyping: boolean;
   currentInput: string;
