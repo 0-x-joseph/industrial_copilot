@@ -1,0 +1,14 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components'; 
+@import 'tailwindcss/utilities';
+@import './colors.css';
+
+/* Global styles for OCP Dashboard */
+html {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+body {
+  background-color: var(--color-background-primary);
+  color: var(--color-text-primary);
+}

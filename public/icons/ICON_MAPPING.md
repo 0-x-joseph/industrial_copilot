@@ -9,20 +9,20 @@
 ## 📐 Icon Mapping for Web Chat UI Specification
 
 ### Header Bar Icons
-| UI Element | Current Icon | Recommended Color | Usage |
-|------------|--------------|-------------------|--------|
-| ☰ Hamburger Menu | `menu.svg` | `#313647` | Main navigation toggle |
-| 🤖 Agent Dropdown | `bot.svg` | `#435663` | Agent selector |  
-| 🧠 Model Dropdown | `settings.svg` | `#435663` | Model selector |
-| ⚙️ Settings | `settings.svg` | `#435663` | Global settings |
+| UI Element | Current Icon | Directory | Color | Usage |
+|------------|--------------|-----------|-------|--------|
+| ☰ Hamburger Menu | `menu.svg` | `/ui/` | `#313647` | Main navigation toggle |
+| 🤖 Agent Dropdown | `bot.svg` | `/agents/` | `#435663` | Agent selector |  
+| 🧠 Model Dropdown | `settings.svg` | `/ui/` | `#435663` | Model selector |
+| ⚙️ Settings | `settings.svg` | `/ui/` | `#435663` | Global settings |
 
 ### Context Bar Icons  
-| UI Element | Current Icon | Recommended Color | Usage |
-|------------|--------------|-------------------|--------|
-| 📁 Files Dropdown | `file-plus.svg` | `#435663` | File context selector |
-| 📋 Commands Dropdown | `commands.svg` | `#435663` | Command context selector |
-| 📊 Dashboard Tab | `panel-right.svg` | `#A3B087` (active) | Tab selector |
-| 🗂️ Workspace | `three-line-open.svg` | `#435663` | Workspace selector |
+| UI Element | Current Icon | Directory | Color | Usage |
+|------------|--------------|-----------|-------|--------|
+| 📁 Files Dropdown | `file-plus.svg` | `/files/` | `#435663` | File context selector |
+| 📋 Commands Dropdown | `commands.svg` | `/commands/` | `#435663` | Command context selector |
+| 📊 Dashboard Tab | `panel-right.svg` | `/dashboard/` | `#A3B087` (active) | Tab selector |
+| 🗂️ Workspace | `three-line-open.svg` | `/ui/` | `#435663` | Workspace selector |
 
 ### Sidebar Icons
 | UI Element | Current Icon | Recommended Color | Usage |

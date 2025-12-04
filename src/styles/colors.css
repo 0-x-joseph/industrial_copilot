@@ -1,0 +1,57 @@
+/* OCP Dashboard Color Palette */
+:root {
+  /* Primary Brand Colors */
+  --color-primary-dark: #313647;    /* Deep Navy - Headers, primary text */
+  --color-primary-medium: #435663;  /* Medium Blue-Grey - Secondary elements */
+  --color-primary-light: #A3B087;   /* Sage Green - Accents, active states */
+  --color-primary-cream: #FFF8D4;   /* Warm Cream - Backgrounds, highlights */
+  
+  /* Semantic Color Mappings */
+  --color-background-primary: var(--color-primary-cream);
+  --color-background-secondary: #FFFFFF;
+  --color-background-tertiary: var(--color-primary-medium);
+  
+  --color-text-primary: var(--color-primary-dark);
+  --color-text-secondary: var(--color-primary-medium);
+  --color-text-muted: #6B7280;
+  --color-text-inverse: var(--color-primary-cream);
+  
+  --color-border-primary: var(--color-primary-medium);
+  --color-border-secondary: #E5E7EB;
+  --color-border-accent: var(--color-primary-light);
+  
+  /* Interactive States */
+  --color-hover: var(--color-primary-light);
+  --color-active: var(--color-primary-dark);
+  --color-focus: var(--color-primary-light);
+  
+  /* Icon Colors */
+  --color-icon-primary: var(--color-primary-dark);
+  --color-icon-secondary: var(--color-primary-medium);
+  --color-icon-accent: var(--color-primary-light);
+  --color-icon-muted: #9CA3AF;
+  
+  /* Chat Interface Specific */
+  --color-chat-header: var(--color-primary-dark);
+  --color-chat-background: var(--color-primary-cream);
+  --color-chat-sidebar: #F9FAFB;
+  --color-chat-message-user: var(--color-primary-light);
+  --color-chat-message-ai: #FFFFFF;
+  
+  /* Context Bar */
+  --color-context-bar-bg: #F3F4F6;
+  --color-context-active: var(--color-primary-light);
+  --color-context-inactive: var(--color-primary-medium);
+}
+
+/* Dark Mode Support (Optional) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background-primary: var(--color-primary-dark);
+    --color-background-secondary: var(--color-primary-medium);
+    --color-text-primary: var(--color-primary-cream);
+    --color-text-secondary: var(--color-primary-light);
+    --color-chat-background: var(--color-primary-dark);
+    --color-chat-sidebar: #2A2E3A;
+  }
+}
