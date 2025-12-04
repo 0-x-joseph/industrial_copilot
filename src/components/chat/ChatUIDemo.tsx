@@ -30,24 +30,11 @@ export const ChatHeader: React.FC<{
   onDashboard?: () => void;
   onWorkspace?: () => void;
   onSettings?: () => void;
-  onSidebarToggle?: () => void;
-  sidebarOpen?: boolean;
-}> = ({ onDashboard, onWorkspace, onSettings, onSidebarToggle, sidebarOpen }) => {
+}> = ({ onDashboard, onWorkspace, onSettings }) => {
   return (
     <header className="flex items-center justify-between px-4 py-2.5 bg-[#313647] text-[#FFF8D4] shadow-sm border-b border-[#435663]">
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
-          {/* Sidebar toggle button */}
-          {onSidebarToggle && (
-            <button 
-              onClick={onSidebarToggle}
-              className="p-1.5 rounded-md hover:bg-[#435663] transition-colors"
-              aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
-            >
-              <Icon name="workspace" size={16} color="inverse" />
-            </button>
-          )}
-          
           <div className="w-6 h-6 bg-[#A3B087] rounded-full flex items-center justify-center">
             <Icon name="agent-selector" size={16} color="inverse" />
           </div>
@@ -802,8 +789,6 @@ export const ChatUIDemo: React.FC = () => {
         onDashboard={handleDashboard}
         onWorkspace={handleWorkspace}
         onSettings={handleSettings}
-        onSidebarToggle={handleSidebarToggle}
-        sidebarOpen={sidebarOpen}
       />
 
       
@@ -834,8 +819,21 @@ export const ChatUIDemo: React.FC = () => {
           </div>
         )}
         
-        <main className="flex-1 flex flex-col min-w-0">
-          <div className="flex-1 p-3 md:p-6 overflow-y-auto">
+        <main className="flex-1 flex flex-col min-w-0 relative">
+          {/* Sidebar Toggle Button - Top Left of Main Content */}
+          <button
+            onClick={handleSidebarToggle}
+            className={`
+              absolute top-4 left-4 z-40 p-2.5 bg-[#A3B087] text-white rounded-lg shadow-md
+              hover:bg-[#8FA372] transition-all duration-200 hover:scale-105
+              ${sidebarOpen && 'md:hidden'}
+            `}
+            aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+          >
+            <Icon name="workspace" size={16} color="inverse" />
+          </button>
+          
+          <div className={`flex-1 p-3 md:p-6 overflow-y-auto ${!sidebarOpen ? 'pt-16 md:pt-6' : ''}`}>
             <div className="max-w-4xl mx-auto">
               {/* Messages */}
               {chatState.messages.map((message) => (
