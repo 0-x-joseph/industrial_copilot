@@ -768,7 +768,7 @@ export const ChatUIDemo: React.FC = () => {
   };
 
   const handleDashboard = () => {
-    alert('Dashboard navigation functionality will be implemented here');
+    window.location.href = '/dashboard';
   };
 
   const handleWorkspace = () => {

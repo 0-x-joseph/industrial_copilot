@@ -15,6 +15,54 @@ export default function Home() {
           </p>
         </header>
 
+        {/* Main Features Section */}
+        <div className="grid md:grid-cols-2 gap-8 mb-12 max-w-4xl mx-auto">
+          {/* Dashboard */}
+          <div className="bg-white rounded-lg shadow-lg p-8 border-2 border-primary-light">
+            <div className="flex items-center gap-3 mb-4">
+              <Icon name="dashboard-tab" size={32} color="accent" />
+              <h2 className="text-2xl font-bold text-primary-dark">Main Dashboard</h2>
+            </div>
+            <p className="text-primary-medium mb-6">
+              Complete dashboard interface with header navigation and empty content area ready for development.
+            </p>
+            <div className="flex flex-col gap-3">
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-primary-light text-white rounded-lg hover:bg-primary-light/90 transition-colors font-medium"
+              >
+                <Icon name="dashboard-tab" size={20} color="inverse" />
+                Launch Dashboard
+              </Link>
+              <Link
+                href="/test/dashboard"
+                className="inline-flex items-center gap-2 px-4 py-2 border border-primary-light text-primary-light rounded-lg hover:bg-primary-light/5 transition-colors text-sm"
+              >
+                <Icon name="settings" size={16} color="accent" />
+                Test Dashboard Features
+              </Link>
+            </div>
+          </div>
+
+          {/* Chat Interface */}
+          <div className="bg-white rounded-lg shadow-lg p-8 border-2 border-primary-medium">
+            <div className="flex items-center gap-3 mb-4">
+              <Icon name="agent-selector" size={32} color="accent" />
+              <h2 className="text-2xl font-bold text-primary-dark">Chat Interface</h2>
+            </div>
+            <p className="text-primary-medium mb-6">
+              Complete chat UI with floating sidebar toggle, context panel, and responsive design.
+            </p>
+            <Link
+              href="/test/chat"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-primary-medium text-white rounded-lg hover:bg-primary-dark transition-colors font-medium"
+            >
+              <Icon name="agent-selector" size={20} color="inverse" />
+              Launch Chat
+            </Link>
+          </div>
+        </div>
+
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {/* Icon System Test */}
           <div className="bg-white rounded-lg shadow-md p-6 border border-primary-medium/20">
@@ -41,24 +89,6 @@ export default function Home() {
                 Enhanced
               </Link>
             </div>
-          </div>
-
-          {/* Chat UI Test */}
-          <div className="bg-white rounded-lg shadow-md p-6 border border-primary-medium/20">
-            <div className="flex items-center gap-3 mb-4">
-              <Icon name="agent-selector" size={24} color="accent" />
-              <h2 className="text-xl font-semibold text-primary-dark">Chat Interface</h2>
-            </div>
-            <p className="text-primary-medium mb-4">
-              Full chat UI from Web Specification
-            </p>
-            <Link
-              href="/test/chat"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary-light text-white rounded-md hover:bg-primary-medium transition-colors"
-            >
-              <Icon name="send" size={16} color="inverse" />
-              Test Chat
-            </Link>
           </div>
 
           {/* Components Test */}
