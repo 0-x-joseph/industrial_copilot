@@ -967,7 +967,7 @@ export const ChatUIDemo: React.FC = () => {
             `}
             aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
           >
-            <Icon name="workspace" size={16} color="inverse" />
+            <Icon name="sidebar" size={16} color="inverse" />
           </button>
           
           <div className={`flex-1 p-3 md:p-6 overflow-y-auto ${!sidebarOpen ? 'pt-16 md:pt-6' : ''}`}>
