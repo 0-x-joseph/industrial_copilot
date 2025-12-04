@@ -101,47 +101,50 @@ export const ChatSidebar: React.FC<{ onNewChat?: () => void }> = ({ onNewChat })
   ];
 
   return (
-    <aside className="w-64 bg-[#F9FAFB] border-r border-[#E5E7EB] p-4 h-full overflow-y-auto">
+    <aside className="w-64 bg-[#313647] border-r border-[#435663] p-4 h-full overflow-y-auto">
       {/* Mobile header with close button */}
-      <div className="md:hidden flex items-center justify-between mb-4 pb-2 border-b border-[#E5E7EB]">
-        <h2 className="text-lg font-semibold text-[#313647]">Chat History</h2>
-        <button className="p-1.5 rounded-md hover:bg-[#E5E7EB] transition-colors">
-          <Icon name="minus" size={16} color="secondary" />
+      <div className="md:hidden flex items-center justify-between mb-4 pb-2 border-b border-[#435663]">
+        <h2 className="text-lg font-semibold text-[#FFF8D4]">Chat History</h2>
+        <button className="p-1.5 rounded-md hover:bg-[#435663] transition-colors">
+          <Icon name="minus" size={16} color="inverse" />
         </button>
       </div>
 
       <div className="mb-6">
-        <button onClick={onNewChat} className="flex items-center gap-2 w-full px-4 py-3 text-left rounded-lg bg-[#A3B087] text-white hover:bg-[#8B9474] transition-colors">
-          <Icon name="new-chat" size={20} color="inverse" />
+        <button 
+          onClick={onNewChat} 
+          className="flex items-center gap-2 w-full px-4 py-2 text-sm font-medium transition-colors rounded-lg bg-[#A3B087] text-white hover:bg-[#8B9474] shadow-sm"
+        >
+          <Icon name="new-chat" size={16} color="inverse" />
           <span>New Chat</span>
         </button>
       </div>
       
       <div>
-        <h3 className="text-sm font-semibold text-[#313647] mb-3">Recent Chats</h3>
+        <h3 className="text-sm font-semibold text-[#FFF8D4] mb-3">Recent Chats</h3>
         <div className="space-y-1">
           {recentChats.map((chat) => (
-            <div
+            <button
               key={chat.id}
-              className={`flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer transition-colors group ${
+              className={`flex items-center gap-2 w-full px-4 py-2 text-sm font-medium transition-colors rounded-lg text-left group ${
                 chat.active 
                   ? 'bg-[#A3B087] text-white' 
-                  : 'hover:bg-[#E5E7EB] text-[#435663]'
+                  : 'text-[#FFF8D4] hover:bg-[#435663] hover:text-white'
               }`}
             >
               <Icon 
                 name="dot" 
                 size={16} 
-                color={chat.active ? 'inverse' : 'secondary'} 
+                color={chat.active ? 'inverse' : 'inverse'} 
               />
-              <span className="text-sm truncate">{chat.title}</span>
-              <ChatIcon 
+              <span className="truncate flex-1">{chat.title}</span>
+              <Icon 
                 name="chat-options" 
-                color={chat.active ? 'inverse' : 'secondary'}
-                interactive 
-                className="ml-auto opacity-0 group-hover:opacity-100"
+                size={16}
+                color={chat.active ? 'inverse' : 'inverse'}
+                className="opacity-0 group-hover:opacity-100 flex-shrink-0"
               />
-            </div>
+            </button>
           ))}
         </div>
       </div>
