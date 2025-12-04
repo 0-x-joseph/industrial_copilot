@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Icon, HeaderIcon, ContextIcon, ActionIcon, ChatIcon } from '@/components/ui';
+import { Icon } from '@/components/ui';
 
 // Types for enhanced chat functionality
 interface Message {
@@ -30,11 +30,24 @@ export const ChatHeader: React.FC<{
   onDashboard?: () => void;
   onWorkspace?: () => void;
   onSettings?: () => void;
-}> = ({ onDashboard, onWorkspace, onSettings }) => {
+  onSidebarToggle?: () => void;
+  sidebarOpen?: boolean;
+}> = ({ onDashboard, onWorkspace, onSettings, onSidebarToggle, sidebarOpen }) => {
   return (
     <header className="flex items-center justify-between px-4 py-2.5 bg-[#313647] text-[#FFF8D4] shadow-sm border-b border-[#435663]">
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
+          {/* Sidebar toggle button */}
+          {onSidebarToggle && (
+            <button 
+              onClick={onSidebarToggle}
+              className="p-1.5 rounded-md hover:bg-[#435663] transition-colors"
+              aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+            >
+              <Icon name="workspace" size={16} color="inverse" />
+            </button>
+          )}
+          
           <div className="w-6 h-6 bg-[#A3B087] rounded-full flex items-center justify-center">
             <Icon name="agent-selector" size={16} color="inverse" />
           </div>
@@ -107,7 +120,10 @@ export const ChatHeader: React.FC<{
  * Example Sidebar Component with mobile improvements
  * Based on Web Chat UI Specification sidebar design
  */
-export const ChatSidebar: React.FC<{ onNewChat?: () => void }> = ({ onNewChat }) => {
+export const ChatSidebar: React.FC<{ 
+  onNewChat?: () => void;
+  onCollapse?: () => void;
+}> = ({ onNewChat, onCollapse }) => {
   const recentChats = [
     { id: 1, title: 'Q3 Energy Analysis', active: false },
     { id: 2, title: 'Sales Visualization', active: true },
@@ -116,10 +132,26 @@ export const ChatSidebar: React.FC<{ onNewChat?: () => void }> = ({ onNewChat })
 
   return (
     <aside className="w-64 bg-[#313647] border-r border-[#435663] p-4 h-full overflow-y-auto">
+      {/* Desktop header with collapse button */}
+      <div className="hidden md:flex items-center justify-between mb-4 pb-2 border-b border-[#435663]">
+        <h2 className="text-lg font-semibold text-[#FFF8D4]">Chat History</h2>
+        <button 
+          onClick={onCollapse}
+          className="p-1.5 rounded-md hover:bg-[#435663] transition-colors"
+          aria-label="Collapse sidebar"
+        >
+          <Icon name="workspace" size={16} color="inverse" />
+        </button>
+      </div>
+
       {/* Mobile header with close button */}
       <div className="md:hidden flex items-center justify-between mb-4 pb-2 border-b border-[#435663]">
         <h2 className="text-lg font-semibold text-[#FFF8D4]">Chat History</h2>
-        <button className="p-1.5 rounded-md hover:bg-[#435663] transition-colors">
+        <button 
+          onClick={onCollapse}
+          className="p-1.5 rounded-md hover:bg-[#435663] transition-colors"
+          aria-label="Close sidebar"
+        >
           <Icon name="minus" size={16} color="inverse" />
         </button>
       </div>
@@ -335,7 +367,6 @@ const ContextPanel: React.FC<{ isVisible: boolean }> = ({ isVisible }) => {
   const [activeTab, setActiveTab] = useState<'files' | 'commands' | 'agents' | 'tabs' | 'workspace'>('files');
   
   // Selection state management for tabs with radio-style selection
-  const [selectedAgent, setSelectedAgent] = useState<string>('Data Analyst');
   const [selectedDashboard, setSelectedDashboard] = useState<string>('Energy Dashboard');
   const [selectedWorkspace, setSelectedWorkspace] = useState<string>('Main');
   
@@ -757,12 +788,22 @@ export const ChatUIDemo: React.FC = () => {
     alert('Workspace navigation functionality will be implemented here');
   };
 
+  const handleSidebarCollapse = () => {
+    setSidebarOpen(false);
+  };
+
+  const handleSidebarToggle = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-[#FFF8D4] to-[#F3F4F6]">
       <ChatHeader 
         onDashboard={handleDashboard}
         onWorkspace={handleWorkspace}
         onSettings={handleSettings}
+        onSidebarToggle={handleSidebarToggle}
+        sidebarOpen={sidebarOpen}
       />
 
       
@@ -770,7 +811,10 @@ export const ChatUIDemo: React.FC = () => {
         {/* Desktop sidebar - always visible when open */}
         {sidebarOpen && (
           <div className="hidden md:block">
-            <ChatSidebar />
+            <ChatSidebar 
+              onNewChat={handleNewChat}
+              onCollapse={handleSidebarCollapse}
+            />
           </div>
         )}
         
@@ -778,11 +822,14 @@ export const ChatUIDemo: React.FC = () => {
         {sidebarOpen && (
           <div className="md:hidden absolute inset-0 z-50 flex animate-in fade-in duration-200">
             <div className="w-64 bg-white shadow-xl transform transition-transform duration-300 ease-out animate-in slide-in-from-left">
-              <ChatSidebar />
+              <ChatSidebar 
+                onNewChat={handleNewChat}
+                onCollapse={handleSidebarCollapse}
+              />
             </div>
             <div 
               className="flex-1 bg-black bg-opacity-50 transition-opacity duration-200"
-              onClick={() => setSidebarOpen(false)}
+              onClick={handleSidebarCollapse}
             />
           </div>
         )}
@@ -1172,7 +1219,7 @@ const EnhancedChatInput: React.FC<EnhancedChatInputProps> = ({
             type="text"
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyPress}
             placeholder={placeholder}
             disabled={disabled || isTyping}
             className="flex-1 text-[#313647] placeholder-[#9CA3AF] bg-transparent focus:outline-none text-base py-1"
