@@ -10,6 +10,7 @@ const iconMap = {
   'agent-selector': 'bot',
   'model-selector': 'settings', 
   'settings': 'settings',
+  'settingsprimary': 'settingsprimary',
   
   // Context Bar
   'files': 'file-plus',
@@ -29,6 +30,7 @@ const iconMap = {
   'thumbs-up': 'thumbs-up',
   'search': 'search',
   'share': 'share',
+  'sharecream': 'sharecream',
   'minus': 'minus',
   'dot': 'dot',
   'small-circle': 'small-cercel',

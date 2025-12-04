@@ -49,7 +49,22 @@ export const ChatHeader: React.FC<{
       </div>
       
       <div className="flex items-center gap-2">
-
+        {/* Desktop Layout */}
+        <div className="hidden sm:flex items-center gap-2">
+          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#435663] hover:bg-[#A3B087] transition-all duration-200 group">
+            <Icon name="agent-selector" size={16} color="inverse" />
+            <span className="text-sm font-medium">Data Analyst</span>
+            <Icon name="dropdown" size={16} color="inverse" className="group-hover:rotate-180 transition-transform duration-200" />
+          </button>
+          
+          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#435663] hover:bg-[#A3B087] transition-all duration-200 group">
+            <div className="w-3 h-3 bg-gradient-to-br from-[#A3B087] to-[#313647] rounded-sm flex items-center justify-center">
+              <span className="text-[7px] font-bold text-white">AI</span>
+            </div>
+            <span className="text-sm font-medium">GPT-4</span>
+            <Icon name="dropdown" size={16} color="inverse" className="group-hover:rotate-180 transition-transform" />
+          </button>
+        </div>
 
         {/* Mobile Layout - Compact dropdowns */}
         <div className="flex sm:hidden items-center gap-1">
@@ -79,7 +94,7 @@ export const ChatHeader: React.FC<{
             className="p-1.5 rounded-md hover:bg-[#435663] transition-colors"
             aria-label="Share chat"
           >
-            <Icon name="sharecream" size={20} color="inverse" />
+            <Icon name="share" size={20} color="inverse" />
           </button>
         </div>
       </div>
@@ -166,7 +181,7 @@ export const MessageBubble: React.FC<{ message: Message; onCopy?: () => void }> 
           ${isUser ? 'bg-[#A3B087]' : isSystem ? 'bg-[#435663]' : isError ? 'bg-red-500' : 'bg-[#313647]'}
         `}>
           <Icon 
-            name={isUser ? 'dot' : isSystem ? 'settings' : isError ? 'minus' : 'agent-selector'} 
+            name={isUser ? 'dot' : isSystem ? 'settingsprimary' : isError ? 'minus' : 'agent-selector'} 
             size={16} 
             color="inverse" 
             
@@ -400,28 +415,31 @@ const ContextPanel: React.FC<{ isVisible: boolean }> = ({ isVisible }) => {
         )}
 
         {activeTab === 'agents' && (
-          <div>
+          <div className="space-y-2">
             <div className="text-sm font-medium text-[#313647] mb-3">Available Agents</div>
-            <div className="flex border-b border-[#E5E7EB] bg-[#F9FAFB]">
-              {[
-                { name: 'Data Analyst', active: true },
-                { name: 'Energy Expert', active: false },
-                { name: 'Business Strategist', active: false },
-                { name: 'Technical Writer', active: false },
-              ].map((agent) => (
-                <button
-                  key={agent.name}
-                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors ${
-                    agent.active
-                      ? 'bg-[#A3B087] text-white border-b-2 border-[#A3B087]'
-                      : 'text-[#435663] hover:bg-[#E5E7EB] hover:text-[#313647]'
+            {[
+              { name: 'Data Analyst', desc: 'Specializes in data analysis and insights' },
+              { name: 'Energy Expert', desc: 'Focuses on energy optimization and sustainability' },
+              { name: 'Business Strategist', desc: 'Provides strategic business guidance' },
+              { name: 'Technical Writer', desc: 'Creates documentation and technical content' },
+            ].map((agent) => {
+              const isSelected = selectedAgent === agent.name;
+              return (
+                <div 
+                  key={agent.name} 
+                  onClick={() => setSelectedAgent(agent.name)}
+                  className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
+                    isSelected ? 'bg-[#A3B087] text-[#FFF8D4] shadow-md' : 'bg-white border border-[#E5E7EB] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] hover:shadow-sm'
                   }`}
                 >
-                  <Icon name="agent-selector" size={16} color={agent.active ? 'inverse' : 'secondary'} />
-                  {agent.name}
-                </button>
-              ))}
-            </div>
+                  <Icon name="agent-selector" size={16} color={isSelected ? 'inverse' : 'primary'} />
+                  <div className="flex-1">
+                    <div className={`text-sm font-medium ${isSelected ? 'text-[#FFF8D4]' : 'text-[#313647]'}`}>{agent.name}</div>
+                    <div className={`text-xs ${isSelected ? 'text-[#FFF8D4]' : 'text-[#313647]'}`}>{agent.desc}</div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
 
