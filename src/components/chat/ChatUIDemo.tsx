@@ -2,6 +2,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Icon } from '@/components/ui';
+import { opcClient } from '@/lib/opencode-client';
+import type { OCPMessage, OCPSession } from '@/types/opencode';
 
 // Types for enhanced chat functionality
 interface Message {
@@ -18,9 +20,11 @@ interface Message {
 }
 
 interface ChatState {
-  messages: Message[];
+  currentSession: OCPSession | null;
+  messages: OCPMessage[];
   isTyping: boolean;
   currentInput: string;
+  connectionStatus: 'connected' | 'connecting' | 'disconnected';
 }
 
 /**
@@ -30,7 +34,8 @@ export const ChatHeader: React.FC<{
   onDashboard?: () => void;
   onWorkspace?: () => void;
   onSettings?: () => void;
-}> = ({ onDashboard, onWorkspace, onSettings }) => {
+  connectionStatus?: 'connected' | 'connecting' | 'disconnected';
+}> = ({ onDashboard, onWorkspace, onSettings, connectionStatus = 'connecting' }) => {
   return (
     <header className="flex items-center justify-between px-4 py-2.5 bg-[#313647] text-[#FFF8D4] shadow-sm border-b border-[#435663]">
       <div className="flex items-center gap-3">
@@ -63,7 +68,20 @@ export const ChatHeader: React.FC<{
       </div>
       
       <div className="flex items-center gap-2">
-
+        {/* Connection Status Indicator */}
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#435663] bg-opacity-50">
+          <div className={`
+            w-2 h-2 rounded-full transition-colors duration-300
+            ${connectionStatus === 'connected' ? 'bg-green-400' : 
+              connectionStatus === 'connecting' ? 'bg-yellow-400 animate-pulse' : 
+              'bg-red-400'}
+          `} />
+          <span className="text-xs font-medium text-[#FFF8D4]">
+            {connectionStatus === 'connected' ? 'Connected' : 
+             connectionStatus === 'connecting' ? 'Connecting...' : 
+             'Disconnected'}
+          </span>
+        </div>
 
         {/* Mobile Layout - Compact dropdowns */}
         <div className="flex sm:hidden items-center gap-1">
@@ -643,41 +661,11 @@ export const MessageComposer: React.FC<{
  */
 export const ChatUIDemo: React.FC = () => {
   const [chatState, setChatState] = useState<ChatState>({
-    messages: [
-      {
-        id: '1',
-        type: 'system',
-        content: 'Welcome to OCP Chat! I\'m your AI assistant ready to help with data analysis, energy optimization, and dashboard insights.',
-        timestamp: new Date(Date.now() - 300000),
-      },
-      {
-        id: '2',
-        type: 'user',
-        content: 'Can you help me analyze the Q3 energy consumption data?',
-        timestamp: new Date(Date.now() - 240000),
-        status: 'sent'
-      },
-      {
-        id: '3',
-        type: 'assistant',
-        content: 'I\'d be happy to help you analyze Q3 energy consumption! Let me break down what I can do:\n\n1. **Data Overview**: I can summarize key metrics and trends\n2. **Comparative Analysis**: Compare against previous quarters\n3. **Efficiency Insights**: Identify optimization opportunities\n\nHere\'s a sample code snippet to get started:\n\n```python\n# Energy consumption analysis\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\n# Load Q3 data\ndf = pd.read_csv(\'q3_energy_data.csv\')\nprint(f"Total consumption: {df[\'consumption\'].sum():.2f} kWh")\n\n# Create visualization\nplt.plot(df[\'date\'], df[\'consumption\'])\nplt.title(\'Q3 Energy Consumption Trend\')\nplt.show()\n```\n\nWould you like me to focus on any specific aspect of the analysis?',
-        timestamp: new Date(Date.now() - 180000),
-        metadata: {
-          tokens: 156,
-          model: 'GPT-4',
-          hasCode: true
-        }
-      },
-      {
-        id: '4',
-        type: 'user',
-        content: 'Perfect! Can you also show me how to create a dashboard widget for this?',
-        timestamp: new Date(Date.now() - 60000),
-        status: 'sent'
-      }
-    ],
-    isTyping: true,
-    currentInput: ''
+    currentSession: null,
+    messages: [],
+    isTyping: false,
+    currentInput: '',
+    connectionStatus: 'connecting'
   });
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -688,79 +676,227 @@ export const ChatUIDemo: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatState.messages]);
 
-  // Simulate typing response after user message
+  // Test connection on component mount
   useEffect(() => {
-    if (chatState.isTyping) {
-      const timer = setTimeout(() => {
-        const newMessage: Message = {
-          id: Date.now().toString(),
-          type: 'assistant',
-          content: 'Absolutely! Here\'s how to create a dashboard widget for energy consumption:\n\n```typescript\n// Dashboard Widget Component\nimport { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from \'recharts\';\n\nconst EnergyWidget = ({ data }) => {\n  return (\n    <div className="bg-white p-6 rounded-lg shadow">\n      <h3 className="text-lg font-semibold mb-4">Q3 Energy Consumption</h3>\n      <LineChart width={400} height={300} data={data}>\n        <CartesianGrid strokeDasharray="3 3" />\n        <XAxis dataKey="date" />\n        <YAxis />\n        <Tooltip />\n        <Line type="monotone" dataKey="consumption" stroke="#A3B087" strokeWidth={2} />\n      </LineChart>\n    </div>\n  );\n};\n```\n\nThis widget includes:\n✅ Responsive design\n✅ Interactive tooltips\n✅ OCP brand colors\n✅ Real-time data binding\n\nWant me to add any specific features like alerts or comparative views?',
-          timestamp: new Date(),
+    const testConnection = async () => {
+      try {
+        setChatState(prev => ({ ...prev, connectionStatus: 'connecting' }));
+        
+        // Test connection to OpenCode server using direct fetch
+        const baseUrl = "https://analyst-skirts-resolved-moved.trycloudflare.com";
+          
+        const response = await fetch(`${baseUrl}/config`);
+        
+        if (response.ok) {
+          setChatState(prev => ({ ...prev, connectionStatus: 'connected' }));
+          // Auto-create first session
+          await handleNewChat();
+        } else {
+          throw new Error(`Config endpoint returned ${response.status}`);
+        }
+      } catch (error) {
+        console.error('Connection failed:', error);
+        setChatState(prev => ({ ...prev, connectionStatus: 'disconnected' }));
+      }
+    };
+
+    testConnection();
+  }, []);
+
+  // OpenCode session management functions
+  const createNewSession = async (): Promise<OCPSession | null> => {
+    try {
+      const baseUrl = "https://analyst-skirts-resolved-moved.trycloudflare.com";
+        
+      const response = await fetch(`${baseUrl}/session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: `OCP Chat ${new Date().toLocaleString()}` })
+      });
+      
+      if (response.ok) {
+        const sessionData = await response.json();
+        return {
+          ...sessionData,
+          title: sessionData.title || 'New Chat',
+          lastActivity: new Date()
+        };
+      } else {
+        throw new Error(`Session creation failed: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Failed to create session:', error);
+      setChatState(prev => ({ ...prev, connectionStatus: 'disconnected' }));
+    }
+    return null;
+  };
+
+  // Load session messages from OpenCode
+  const loadSessionMessages = async (sessionId: string): Promise<OCPMessage[]> => {
+    try {
+      const response = await opcClient.session.messages({
+        path: { id: sessionId }
+      });
+      
+      if (response.data) {
+        return response.data.map((msg, index) => ({
+          id: `${sessionId}-${index}`,
+          type: msg.info.role === 'user' ? 'user' : 'assistant',
+          content: msg.parts.map(part => part.type === 'text' ? part.text : '').join(''),
+          timestamp: new Date(msg.info.time.created * 1000), // Convert Unix timestamp to Date
+          status: 'sent',
           metadata: {
-            tokens: 198,
-            model: 'GPT-4',
-            hasCode: true
+            sessionId: sessionId,
+            model: msg.info.role === 'assistant' ? 
+              `${msg.info.providerID}/${msg.info.modelID}` : 
+              'User',
+            tokens: msg.info.role === 'assistant' ? 
+              msg.info.tokens?.input + msg.info.tokens?.output : 
+              undefined
+          }
+        }));
+      }
+    } catch (error) {
+      console.error('Failed to load messages:', error);
+    }
+    return [];
+  };
+
+  const handleSendMessage = async () => {
+    if (!chatState.currentInput.trim()) return;
+    
+    let session = chatState.currentSession;
+    
+    // Create session if none exists
+    if (!session) {
+      session = await createNewSession();
+      if (!session) {
+        alert('Failed to create chat session. Please check your connection.');
+        return;
+      }
+    }
+
+    const userMessage: OCPMessage = {
+      id: `${Date.now()}-user`,
+      type: 'user',
+      content: chatState.currentInput,
+      timestamp: new Date(),
+      status: 'sending',
+      metadata: { sessionId: session.id }
+    };
+
+    // Add user message immediately
+    setChatState(prev => ({
+      ...prev,
+      currentSession: session,
+      messages: [...prev.messages, userMessage],
+      currentInput: '',
+      isTyping: true
+    }));
+
+    try {
+      // Store user input before clearing
+      const userInput = chatState.currentInput;
+
+      // Send message to OpenCode using correct endpoint
+      const baseUrl = "https://analyst-skirts-resolved-moved.trycloudflare.com";
+        
+      const messagePayload = {
+        model: { 
+          providerID: "opencode", 
+          modelID: "big-pickle" 
+        },
+        parts: [{ 
+          type: "text", 
+          text: userInput 
+        }],
+      };
+
+      const response = await fetch(`${baseUrl}/session/${session.id}/message`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(messagePayload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      // Mark user message as sent
+      setChatState(prev => ({
+        ...prev,
+        messages: prev.messages.map(msg => 
+          msg.id === userMessage.id ? { ...msg, status: 'sent' } : msg
+        ),
+        isTyping: false
+      }));
+
+      // Add assistant response
+      if (data) {
+        const assistantMessage: OCPMessage = {
+          id: `${Date.now()}-assistant`,
+          type: 'assistant',
+          content: data.parts ? data.parts.map((part: any) => 
+            part.type === 'text' ? part.text : ''
+          ).join('') : 'Response received',
+          timestamp: new Date(),
+          status: 'sent',
+          metadata: {
+            sessionId: session.id,
+            model: data.info?.providerID && data.info?.modelID 
+              ? `${data.info.providerID}/${data.info.modelID}` 
+              : 'opencode/big-pickle',
+            tokens: data.info?.tokens ? 
+              (data.info.tokens.input || 0) + (data.info.tokens.output || 0) : 0
           }
         };
 
         setChatState(prev => ({
           ...prev,
-          messages: [...prev.messages, newMessage],
-          isTyping: false
+          messages: [...prev.messages, assistantMessage]
         }));
-      }, 3000);
+      }
 
-      return () => clearTimeout(timer);
-    }
-  }, [chatState.isTyping]);
-
-  const handleSendMessage = () => {
-    if (!chatState.currentInput.trim()) return;
-
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      type: 'user',
-      content: chatState.currentInput,
-      timestamp: new Date(),
-      status: 'sending'
-    };
-
-    setChatState(prev => ({
-      ...prev,
-      messages: [...prev.messages, newMessage],
-      currentInput: '',
-      isTyping: true
-    }));
-
-    // Simulate message sent status
-    setTimeout(() => {
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      
+      // Mark user message as failed
       setChatState(prev => ({
         ...prev,
         messages: prev.messages.map(msg => 
-          msg.id === newMessage.id ? { ...msg, status: 'sent' } : msg
-        )
+          msg.id === userMessage.id ? { ...msg, status: 'failed' } : msg
+        ),
+        isTyping: false,
+        connectionStatus: 'disconnected'
       }));
-    }, 500);
+    }
   };
 
   const handleCopyMessage = (content: string) => {
     navigator.clipboard?.writeText(content);
   };
 
-  const handleNewChat = () => {
-    setChatState({
-      messages: [
-        {
+  const handleNewChat = async () => {
+    const newSession = await createNewSession();
+    if (newSession) {
+      setChatState({
+        currentSession: newSession,
+        messages: [{
           id: '1',
           type: 'system',
-          content: 'Welcome to OCP Chat! I\'m your AI assistant ready to help with data analysis, energy optimization, and dashboard insights.',
+          content: 'Welcome to OCP Chat! I\'m your OpenCode AI assistant ready to help with data analysis, energy optimization, and dashboard insights.',
           timestamp: new Date(),
-        }
-      ],
-      isTyping: false,
-      currentInput: ''
-    });
+          metadata: { sessionId: newSession.id }
+        }],
+        isTyping: false,
+        currentInput: '',
+        connectionStatus: 'connected'
+      });
+    }
   };
 
   const handleSettings = () => {
@@ -789,6 +925,7 @@ export const ChatUIDemo: React.FC = () => {
         onDashboard={handleDashboard}
         onWorkspace={handleWorkspace}
         onSettings={handleSettings}
+        connectionStatus={chatState.connectionStatus}
       />
 
       

@@ -14,8 +14,9 @@ const iconMap = {
   // Context Bar
   'files': 'file-plus',
   'commands': 'commands',
-  'dashboard-tab': 'panel-right',
-  'workspace': 'three-line-open',
+  'dashboard-tab': 'dot',
+  'workspace': 'dot',
+  'sidebar': 'sidebar',
   'dropdown': 'ellipsis', // Can be used for dropdown arrows
   
   // Chat Interface
