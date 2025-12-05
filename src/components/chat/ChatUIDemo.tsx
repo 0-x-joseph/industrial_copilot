@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Icon } from '@/components/ui';
 import { opcClient } from '@/lib/opencode-client';
+import { ModelSelector } from './ModelSelector';
 import type { OCPMessage, OCPSession } from '@/types/opencode';
 
 // Types for enhanced chat functionality
@@ -19,6 +20,12 @@ interface Message {
   };
 }
 
+interface ModelInfo {
+  providerID: string;
+  modelID: string;
+  displayName?: string;
+}
+
 interface ChatState {
   currentSession: OCPSession | null;
   sessions: OCPSession[];  // List of all available sessions
@@ -26,6 +33,9 @@ interface ChatState {
   isTyping: boolean;
   currentInput: string;
   connectionStatus: 'connected' | 'connecting' | 'disconnected';
+  currentModel?: ModelInfo;
+  tokensUsed?: number;
+  tokensLimit?: number;
 }
 
 /**
@@ -36,7 +46,11 @@ export const ChatHeader: React.FC<{
   onWorkspace?: () => void;
   onSettings?: () => void;
   connectionStatus?: 'connected' | 'connecting' | 'disconnected';
-}> = ({ onDashboard, onWorkspace, onSettings, connectionStatus = 'connecting' }) => {
+  currentModel?: ModelInfo;
+  tokensUsed?: number;
+  tokensLimit?: number;
+  onModelChange?: (model: ModelInfo) => void;
+}> = ({ onDashboard, onWorkspace, onSettings, connectionStatus = 'connecting', currentModel, tokensUsed, tokensLimit, onModelChange }) => {
   return (
     <header className="flex items-center justify-between px-4 py-2.5 bg-[#313647] text-[#FFF8D4] shadow-sm border-b border-[#435663]">
       <div className="flex items-center gap-3">
@@ -69,20 +83,13 @@ export const ChatHeader: React.FC<{
       </div>
       
       <div className="flex items-center gap-2">
-        {/* Connection Status Indicator */}
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#435663] bg-opacity-50">
-          <div className={`
-            w-2 h-2 rounded-full transition-colors duration-300
-            ${connectionStatus === 'connected' ? 'bg-green-400' : 
-              connectionStatus === 'connecting' ? 'bg-yellow-400 animate-pulse' : 
-              'bg-red-400'}
-          `} />
-          <span className="text-xs font-medium text-[#FFF8D4]">
-            {connectionStatus === 'connected' ? 'Connected' : 
-             connectionStatus === 'connecting' ? 'Connecting...' : 
-             'Disconnected'}
-          </span>
-        </div>
+        {/* Model Selector */}
+        <ModelSelector
+          currentModel={currentModel}
+          tokensUsed={tokensUsed}
+          tokensLimit={tokensLimit}
+          onModelChange={onModelChange}
+        />
 
         {/* Mobile Layout - Compact dropdowns */}
         <div className="flex sm:hidden items-center gap-1">
@@ -663,10 +670,13 @@ export const MessageComposer: React.FC<{
 export const ChatUIDemo: React.FC = () => {
   const [chatState, setChatState] = useState<ChatState>({
     currentSession: null,
+    sessions: [],
     messages: [],
     isTyping: false,
     currentInput: '',
-    connectionStatus: 'connecting'
+    connectionStatus: 'connecting',
+    tokensUsed: 0,
+    tokensLimit: 100000 // Default token limit
   });
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -803,7 +813,7 @@ export const ChatUIDemo: React.FC = () => {
       const baseUrl = "https://analyst-skirts-resolved-moved.trycloudflare.com";
         
       const messagePayload = {
-        model: { 
+        model: chatState.currentModel || { 
           providerID: "opencode", 
           modelID: "big-pickle" 
         },
@@ -856,10 +866,17 @@ export const ChatUIDemo: React.FC = () => {
           }
         };
 
-        setChatState(prev => ({
-          ...prev,
-          messages: [...prev.messages, assistantMessage]
-        }));
+        setChatState(prev => {
+          // Update token usage
+          const tokenCount = assistantMessage.metadata?.tokens || 0;
+          const newTokensUsed = (prev.tokensUsed || 0) + tokenCount;
+          
+          return {
+            ...prev,
+            messages: [...prev.messages, assistantMessage],
+            tokensUsed: newTokensUsed
+          };
+        });
       }
 
     } catch (error) {
@@ -886,6 +903,7 @@ export const ChatUIDemo: React.FC = () => {
     if (newSession) {
       setChatState({
         currentSession: newSession,
+        sessions: [],
         messages: [{
           id: '1',
           type: 'system',
@@ -920,6 +938,78 @@ export const ChatUIDemo: React.FC = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
+  const handleModelChange = async (model: ModelInfo) => {
+    try {
+      // Update the current model in state
+      setChatState(prev => ({
+        ...prev,
+        currentModel: model
+      }));
+      
+      // Here you could also save the model preference to localStorage or backend
+      localStorage.setItem('ocp-preferred-model', JSON.stringify(model));
+      
+    } catch (error) {
+      console.error('Failed to change model:', error);
+    }
+  };
+
+  // Load initial model configuration
+  useEffect(() => {
+    const loadInitialConfig = async () => {
+      try {
+        // Try to load saved model preference
+        const savedModel = localStorage.getItem('ocp-preferred-model');
+        if (savedModel) {
+          const model = JSON.parse(savedModel);
+          setChatState(prev => ({
+            ...prev,
+            currentModel: model
+          }));
+          return;
+        }
+
+        // Otherwise, load current config from opencode
+        const config = await opcClient.config.get();
+        if (config.data?.model) {
+          // Handle different possible model formats
+          let currentModel: ModelInfo;
+          if (typeof config.data.model === 'string') {
+            // If model is a string, try to parse provider/model format
+            const parts = config.data.model.split('/');
+            if (parts.length >= 2) {
+              currentModel = {
+                providerID: parts[0],
+                modelID: parts.slice(1).join('/')
+              };
+            } else {
+              currentModel = {
+                providerID: 'unknown',
+                modelID: config.data.model
+              };
+            }
+          } else if (typeof config.data.model === 'object' && config.data.model) {
+            currentModel = {
+              providerID: (config.data.model as any).providerID || 'unknown',
+              modelID: (config.data.model as any).modelID || 'unknown'
+            };
+          } else {
+            return;
+          }
+          
+          setChatState(prev => ({
+            ...prev,
+            currentModel: currentModel
+          }));
+        }
+      } catch (error) {
+        console.error('Failed to load initial config:', error);
+      }
+    };
+
+    loadInitialConfig();
+  }, []);
+
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-[#FFF8D4] to-[#F3F4F6]">
       <ChatHeader 
@@ -927,6 +1017,10 @@ export const ChatUIDemo: React.FC = () => {
         onWorkspace={handleWorkspace}
         onSettings={handleSettings}
         connectionStatus={chatState.connectionStatus}
+        currentModel={chatState.currentModel}
+        tokensUsed={chatState.tokensUsed}
+        tokensLimit={chatState.tokensLimit}
+        onModelChange={handleModelChange}
       />
 
       

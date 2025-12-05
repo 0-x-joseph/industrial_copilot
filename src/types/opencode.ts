@@ -24,3 +24,27 @@ export interface ChatSession {
   session: OCPSession;
   messages: OCPMessage[];
 }
+
+// Model and provider types
+export interface ModelInfo {
+  providerID: string;
+  modelID: string;
+  displayName: string;
+}
+
+export interface Provider {
+  id: string;
+  name: string;
+  models: ModelInfo[];
+}
+
+export interface ConfigInfo {
+  model?: {
+    providerID: string;
+    modelID: string;
+  };
+  providers?: Provider[];
+  defaults?: { [key: string]: string };
+  tokensUsed?: number;
+  tokensLimit?: number;
+}
