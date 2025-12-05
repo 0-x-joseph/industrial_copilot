@@ -4,7 +4,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Icon } from '@/components/ui';
 import { opcClient } from '@/lib/opencode-client';
 import { ModelSelector } from './ModelSelector';
-import type { OCPMessage, OCPSession } from '@/types/opencode';
+import { AgentSelector } from './AgentSelector';
+import { CommandsPanel } from './CommandsPanel';
+import type { OCPMessage, OCPSession, MCPCommand, Agent } from '@/types/opencode';
 
 // Types for enhanced chat functionality
 interface Message {
@@ -34,6 +36,7 @@ interface ChatState {
   currentInput: string;
   connectionStatus: 'connected' | 'connecting' | 'disconnected';
   currentModel?: ModelInfo;
+  currentAgent?: Agent;
   tokensUsed?: number;
   tokensLimit?: number;
 }
@@ -47,10 +50,12 @@ export const ChatHeader: React.FC<{
   onSettings?: () => void;
   connectionStatus?: 'connected' | 'connecting' | 'disconnected';
   currentModel?: ModelInfo;
+  currentAgent?: Agent;
   tokensUsed?: number;
   tokensLimit?: number;
   onModelChange?: (model: ModelInfo) => void;
-}> = ({ onDashboard, onWorkspace, onSettings, connectionStatus = 'connecting', currentModel, tokensUsed, tokensLimit, onModelChange }) => {
+  onAgentChange?: (agent: Agent) => void;
+}> = ({ onDashboard, onWorkspace, onSettings, connectionStatus = 'connecting', currentModel, currentAgent, tokensUsed, tokensLimit, onModelChange, onAgentChange }) => {
   return (
     <header className="flex items-center justify-between px-4 py-2.5 bg-[#313647] text-[#FFF8D4] shadow-sm border-b border-[#435663]">
       <div className="flex items-center gap-3">
@@ -83,6 +88,12 @@ export const ChatHeader: React.FC<{
       </div>
       
       <div className="flex items-center gap-2">
+        {/* Agent Selector */}
+        <AgentSelector
+          currentAgent={currentAgent}
+          onAgentChange={onAgentChange}
+        />
+        
         {/* Model Selector */}
         <ModelSelector
           currentModel={currentModel}
@@ -374,9 +385,12 @@ export const MessageWithCode: React.FC<{ content: string }> = ({ content }) => {
 
 
 /**
- * Enhanced Context Panel Component - Collapsible file/tab/workspace selectors
+ * Context Panel Component - appears when context toggle is clicked
  */
-const ContextPanel: React.FC<{ isVisible: boolean }> = ({ isVisible }) => {
+const ContextPanel: React.FC<{ 
+  isVisible: boolean;
+  onCommandSelect?: (command: MCPCommand, server: string) => void;
+}> = ({ isVisible, onCommandSelect }) => {
   const [activeTab, setActiveTab] = useState<'files' | 'commands' | 'agents' | 'tabs' | 'workspace'>('files');
   
   // Selection state management for tabs with radio-style selection
@@ -439,25 +453,10 @@ const ContextPanel: React.FC<{ isVisible: boolean }> = ({ isVisible }) => {
         )}
 
         {activeTab === 'commands' && (
-          <div className="space-y-2">
-            <div className="text-sm font-medium text-[#313647] mb-3">Available Commands</div>
-            {[
-              { name: '/create-chart', enabled: true, desc: 'Generate data visualizations' },
-              { name: '/optimize-energy', enabled: true, desc: 'Run energy optimization analysis' },
-              { name: '/analyze-data', enabled: true, desc: 'Perform statistical analysis' },
-              { name: '/export-dashboard', enabled: false, desc: 'Export current dashboard' },
-              { name: '/generate-report', enabled: false, desc: 'Create comprehensive reports' },
-            ].map((command) => (
-              <label key={command.name} className="flex items-center gap-3 p-2 rounded-md hover:bg-[#F3F4F6] cursor-pointer">
-                <input type="checkbox" defaultChecked={command.enabled} className="rounded text-[#A3B087] focus:ring-[#A3B087]" />
-                <Icon name="commands" size={16} color="secondary" />
-                <div className="flex-1">
-                  <div className="text-sm font-mono font-medium text-[#313647]">{command.name}</div>
-                  <div className="text-xs text-[#9CA3AF]">{command.desc}</div>
-                </div>
-              </label>
-            ))}
-          </div>
+          <CommandsPanel 
+            onCommandSelect={onCommandSelect}
+            className="h-full -m-4"
+          />
         )}
 
         {activeTab === 'agents' && (
@@ -559,7 +558,8 @@ export const MessageComposer: React.FC<{
   onSubmit: (value: string) => void;
   disabled?: boolean;
   isTyping?: boolean;
-}> = ({ value, onChange, onSubmit, disabled = false, isTyping = false }) => {
+  onCommandSelect?: (command: MCPCommand, server: string) => void;
+}> = ({ value, onChange, onSubmit, disabled = false, isTyping = false, onCommandSelect }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showContextPanels, setShowContextPanels] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -585,7 +585,10 @@ export const MessageComposer: React.FC<{
   return (
     <div className="relative p-3 bg-white border-t border-[#E5E7EB]">
       {/* Context Panels */}
-      <ContextPanel isVisible={showContextPanels} />
+      <ContextPanel 
+        isVisible={showContextPanels} 
+        onCommandSelect={onCommandSelect}
+      />
       
       {/* ChatGPT-style Single Cell Input */}
       <form onSubmit={handleSubmit} className="w-full">
@@ -954,7 +957,37 @@ export const ChatUIDemo: React.FC = () => {
     }
   };
 
-  // Load initial model configuration
+  /**
+   * Handle command selection from CommandsPanel
+   * Inserts the command into the input field with proper formatting
+   */
+  const handleCommandSelect = (command: MCPCommand, server: string) => {
+    // Insert command into input with / prefix and space for parameters
+    const commandText = `/${command.name} `;
+    setChatState(prev => ({
+      ...prev,
+      currentInput: commandText
+    }));
+    
+    // Note: Context panel will be closed by MessageComposer state
+    // Future enhancement: Could show parameter form based on command.schema
+  };
+
+  /**
+   * Handle agent selection from AgentSelector
+   * Updates the current agent in state and persists to localStorage
+   */
+  const handleAgentChange = (agent: Agent) => {
+    setChatState(prev => ({
+      ...prev,
+      currentAgent: agent
+    }));
+    
+    // Save agent preference to localStorage
+    localStorage.setItem('ocp-preferred-agent', JSON.stringify(agent));
+  };
+
+  // Load initial model and agent configuration
   useEffect(() => {
     const loadInitialConfig = async () => {
       try {
@@ -966,41 +999,64 @@ export const ChatUIDemo: React.FC = () => {
             ...prev,
             currentModel: model
           }));
-          return;
-        }
-
-        // Otherwise, load current config from opencode
-        const config = await opcClient.config.get();
-        if (config.data?.model) {
-          // Handle different possible model formats
-          let currentModel: ModelInfo;
-          if (typeof config.data.model === 'string') {
-            // If model is a string, try to parse provider/model format
-            const parts = config.data.model.split('/');
-            if (parts.length >= 2) {
+        } else {
+          // Otherwise, load current config from opencode
+          const config = await opcClient.config.get();
+          if (config.data?.model) {
+            // Handle different possible model formats
+            let currentModel: ModelInfo;
+            if (typeof config.data.model === 'string') {
+              // If model is a string, try to parse provider/model format
+              const parts = config.data.model.split('/');
+              if (parts.length >= 2) {
+                currentModel = {
+                  providerID: parts[0],
+                  modelID: parts.slice(1).join('/')
+                };
+              } else {
+                currentModel = {
+                  providerID: 'unknown',
+                  modelID: config.data.model
+                };
+              }
+            } else if (typeof config.data.model === 'object' && config.data.model) {
               currentModel = {
-                providerID: parts[0],
-                modelID: parts.slice(1).join('/')
+                providerID: (config.data.model as any).providerID || 'unknown',
+                modelID: (config.data.model as any).modelID || 'unknown'
               };
             } else {
               currentModel = {
                 providerID: 'unknown',
-                modelID: config.data.model
+                modelID: 'unknown'
               };
             }
-          } else if (typeof config.data.model === 'object' && config.data.model) {
-            currentModel = {
-              providerID: (config.data.model as any).providerID || 'unknown',
-              modelID: (config.data.model as any).modelID || 'unknown'
-            };
-          } else {
-            return;
+            
+            setChatState(prev => ({
+              ...prev,
+              currentModel: currentModel
+            }));
           }
-          
+        }
+
+        // Try to load saved agent preference
+        const savedAgent = localStorage.getItem('ocp-preferred-agent');
+        if (savedAgent) {
+          const agent = JSON.parse(savedAgent);
           setChatState(prev => ({
             ...prev,
-            currentModel: currentModel
+            currentAgent: agent
           }));
+        } else {
+          // Otherwise, load agents and default to the first one
+          const agentsResponse = await opcClient.app.agents();
+          if (agentsResponse.data && agentsResponse.data.length > 0) {
+            const defaultAgent = agentsResponse.data[0];
+            setChatState(prev => ({
+              ...prev,
+              currentAgent: defaultAgent
+            }));
+            localStorage.setItem('ocp-preferred-agent', JSON.stringify(defaultAgent));
+          }
         }
       } catch (error) {
         console.error('Failed to load initial config:', error);
@@ -1018,9 +1074,11 @@ export const ChatUIDemo: React.FC = () => {
         onSettings={handleSettings}
         connectionStatus={chatState.connectionStatus}
         currentModel={chatState.currentModel}
+        currentAgent={chatState.currentAgent}
         tokensUsed={chatState.tokensUsed}
         tokensLimit={chatState.tokensLimit}
         onModelChange={handleModelChange}
+        onAgentChange={handleAgentChange}
       />
 
       
@@ -1111,6 +1169,7 @@ export const ChatUIDemo: React.FC = () => {
             onSubmit={handleSendMessage}
             disabled={false}
             isTyping={chatState.isTyping}
+            onCommandSelect={handleCommandSelect}
           />
         </main>
       </div>
