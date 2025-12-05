@@ -32,32 +32,10 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# CORS Configuration - Allow Next.js frontend (local + production)
-# Get allowed origins from environment variable or use defaults
-def get_cors_origins():
-    """Get CORS origins from environment or use defaults"""
-    env_origins = os.environ.get("ALLOWED_ORIGINS", "")
-    
-    # Default origins (always include localhost for development)
-    default_origins = [
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:3001",
-    ]
-    
-    # Add environment-specified origins
-    if env_origins:
-        extra_origins = [o.strip() for o in env_origins.split(",") if o.strip()]
-        default_origins.extend(extra_origins)
-    
-    # Also allow any Vercel preview deployments
-    return default_origins
-
+# CORS Configuration - Allow all origins for hackathon demo
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=get_cors_origins(),
-    allow_origin_regex=r"https://.*\.vercel\.app",  # Allow all Vercel preview URLs
+    allow_origins=["*"],  # Allow all origins
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
