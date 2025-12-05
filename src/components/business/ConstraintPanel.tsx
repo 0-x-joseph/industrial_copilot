@@ -212,7 +212,7 @@ export const ConstraintPanel: React.FC<ConstraintPanelProps> = ({
                 className="p-1 hover:bg-[#435663] rounded transition-colors"
                 aria-label="Remove rule"
               >
-                <Icon name="close" size={16} color="secondary" />
+                <Icon name="minus" size={16} color="secondary" />
               </button>
             </div>
           ))
@@ -293,7 +293,7 @@ export const ConstraintPanel: React.FC<ConstraintPanelProps> = ({
             </>
           ) : (
             <>
-              <Icon name="play" size={18} color="inverse" />
+              <Icon name="send" size={20} color="inverse" />
               Run Optimization
             </>
           )}

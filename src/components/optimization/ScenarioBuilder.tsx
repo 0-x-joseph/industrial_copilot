@@ -104,16 +104,16 @@ export const ScenarioBuilder: React.FC<ScenarioBuilderProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col bg-slate-900 rounded-lg border border-slate-800">
+    <div className="h-full flex flex-col bg-ocp-900 rounded-lg border border-ocp-400/30">
       {/* Header */}
-      <div className="p-6 border-b border-slate-800">
+      <div className="p-6 border-b border-ocp-400/30">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center">
-            <Icon name="settings" size={20} color="primary" />
+          <div className="w-10 h-10 bg-ocp-accent/10 rounded-lg flex items-center justify-center">
+            <Icon name="settings" size={20} color="accent" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white">Scenario Configuration</h2>
-            <p className="text-sm text-slate-400">Define the problem</p>
+            <h2 className="text-xl font-bold text-ocp-cream">Scenario Configuration</h2>
+            <p className="text-sm text-ocp-300">Define the problem</p>
           </div>
         </div>
       </div>
@@ -122,7 +122,7 @@ export const ScenarioBuilder: React.FC<ScenarioBuilderProps> = ({
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
         {/* Presets */}
         <div>
-          <h3 className="text-sm font-semibold text-slate-300 mb-3 uppercase tracking-wide">
+          <h3 className="text-sm font-semibold text-ocp-300 mb-3 uppercase tracking-wide">
             Quick Presets
           </h3>
           <div className="grid grid-cols-2 gap-2">
@@ -133,8 +133,8 @@ export const ScenarioBuilder: React.FC<ScenarioBuilderProps> = ({
                 className={`
                   p-3 rounded-lg border transition-all
                   ${activePreset === index 
-                    ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' 
-                    : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:border-slate-600'
+                    ? 'bg-ocp-accent/20 border-ocp-accent/50 text-ocp-accent' 
+                    : 'bg-ocp-800/50 border-ocp-400/30 text-ocp-300 hover:border-ocp-400/50'
                   }
                 `}
               >
@@ -149,20 +149,20 @@ export const ScenarioBuilder: React.FC<ScenarioBuilderProps> = ({
 
         {/* Factory Demand */}
         <div>
-          <h3 className="text-sm font-semibold text-slate-300 mb-4 uppercase tracking-wide flex items-center gap-2">
-            <Icon name="dashboard-tab" size={16} color="primary" />
+          <h3 className="text-sm font-semibold text-ocp-300 mb-4 uppercase tracking-wide flex items-center gap-2">
+            <Icon name="dashboard-tab" size={16} color="accent" />
             Factory Demand
           </h3>
           
           {/* Steam Demand Slider */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium text-slate-300">
+              <label className="text-sm font-medium text-ocp-cream-muted">
                 Target Steam (MP)
               </label>
-              <span className="text-2xl font-bold font-mono text-purple-400">
+              <span className="text-2xl font-bold font-mono text-ocp-accent">
                 {config.steamDemand}
-                <span className="text-sm text-slate-500 ml-1">T/h</span>
+                <span className="text-sm text-ocp-400 ml-1">T/h</span>
               </span>
             </div>
             <input
@@ -172,9 +172,9 @@ export const ScenarioBuilder: React.FC<ScenarioBuilderProps> = ({
               step={10}
               value={config.steamDemand}
               onChange={(e) => updateConfig({ steamDemand: parseInt(e.target.value) })}
-              className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-purple-500"
+              className="w-full h-2 bg-ocp-700 rounded-lg appearance-none cursor-pointer accent-ocp-accent"
             />
-            <div className="flex justify-between text-xs text-slate-500 mt-1">
+            <div className="flex justify-between text-xs text-ocp-400 mt-1">
               <span>100</span>
               <span>400 T/h</span>
             </div>
@@ -183,12 +183,12 @@ export const ScenarioBuilder: React.FC<ScenarioBuilderProps> = ({
           {/* Electricity Demand Slider */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium text-slate-300">
+              <label className="text-sm font-medium text-ocp-cream-muted">
                 Target Electricity
               </label>
-              <span className="text-2xl font-bold font-mono text-blue-400">
+              <span className="text-2xl font-bold font-mono text-status-info">
                 {config.electricityDemand}
-                <span className="text-sm text-slate-500 ml-1">MW</span>
+                <span className="text-sm text-ocp-400 ml-1">MW</span>
               </span>
             </div>
             <input
@@ -198,9 +198,9 @@ export const ScenarioBuilder: React.FC<ScenarioBuilderProps> = ({
               step={5}
               value={config.electricityDemand}
               onChange={(e) => updateConfig({ electricityDemand: parseInt(e.target.value) })}
-              className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+              className="w-full h-2 bg-ocp-700 rounded-lg appearance-none cursor-pointer accent-status-info"
             />
-            <div className="flex justify-between text-xs text-slate-500 mt-1">
+            <div className="flex justify-between text-xs text-ocp-400 mt-1">
               <span>20</span>
               <span>100 MW</span>
             </div>
@@ -209,14 +209,14 @@ export const ScenarioBuilder: React.FC<ScenarioBuilderProps> = ({
 
         {/* External Conditions */}
         <div>
-          <h3 className="text-sm font-semibold text-slate-300 mb-4 uppercase tracking-wide flex items-center gap-2">
-            <Icon name="workspace" size={16} color="primary" />
+          <h3 className="text-sm font-semibold text-ocp-300 mb-4 uppercase tracking-wide flex items-center gap-2">
+            <Icon name="workspace" size={16} color="accent" />
             External Conditions
           </h3>
 
           {/* Grid Period Toggle */}
           <div className="mb-4">
-            <label className="text-sm font-medium text-slate-300 mb-2 block">
+            <label className="text-sm font-medium text-ocp-cream-muted mb-2 block">
               Grid Period
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -225,17 +225,14 @@ export const ScenarioBuilder: React.FC<ScenarioBuilderProps> = ({
                 className={`
                   px-4 py-3 rounded-lg border transition-all text-sm font-medium
                   ${config.gridPeriod === 'off-peak'
-                    ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400'
-                    : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:border-slate-600'
+                    ? 'bg-ocp-accent/20 border-ocp-accent/50 text-ocp-accent'
+                    : 'bg-ocp-800/50 border-ocp-400/30 text-ocp-300 hover:border-ocp-400/50'
                   }
                 `}
               >
                 <div className="flex items-center justify-center gap-2">
-                  <span>💡</span>
-                  <div className="text-left">
-                    <div>Off-Peak</div>
-                    <div className="text-xs opacity-70">0.55 DH/kWh</div>
-                  </div>
+                  <span>Off-Peak</span>
+                  <div className="text-xs opacity-70">0.55 DH/kWh</div>
                 </div>
               </button>
               <button
@@ -243,17 +240,14 @@ export const ScenarioBuilder: React.FC<ScenarioBuilderProps> = ({
                 className={`
                   px-4 py-3 rounded-lg border transition-all text-sm font-medium
                   ${config.gridPeriod === 'peak'
-                    ? 'bg-rose-500/20 border-rose-500/50 text-rose-400'
-                    : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:border-slate-600'
+                    ? 'bg-status-danger-muted border-status-danger/50 text-status-danger'
+                    : 'bg-ocp-800/50 border-ocp-400/30 text-ocp-300 hover:border-ocp-400/50'
                   }
                 `}
               >
                 <div className="flex items-center justify-center gap-2">
-                  <span>⚡</span>
-                  <div className="text-left">
-                    <div>Peak</div>
-                    <div className="text-xs opacity-70">1.27 DH/kWh</div>
-                  </div>
+                  <span>Peak</span>
+                  <div className="text-xs opacity-70">1.27 DH/kWh</div>
                 </div>
               </button>
             </div>
@@ -261,7 +255,7 @@ export const ScenarioBuilder: React.FC<ScenarioBuilderProps> = ({
 
           {/* Sulfur Supply Toggle */}
           <div>
-            <label className="text-sm font-medium text-slate-300 mb-2 block">
+            <label className="text-sm font-medium text-ocp-cream-muted mb-2 block">
               Sulfur Supply (Free Steam Source)
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -272,8 +266,8 @@ export const ScenarioBuilder: React.FC<ScenarioBuilderProps> = ({
                   className={`
                     px-3 py-2 rounded-lg border transition-all text-sm font-medium
                     ${config.sulfurSupply === level
-                      ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400'
-                      : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:border-slate-600'
+                      ? 'bg-ocp-accent/20 border-ocp-accent/50 text-ocp-accent'
+                      : 'bg-ocp-800/50 border-ocp-400/30 text-ocp-300 hover:border-ocp-400/50'
                     }
                   `}
                 >
@@ -281,18 +275,18 @@ export const ScenarioBuilder: React.FC<ScenarioBuilderProps> = ({
                 </button>
               ))}
             </div>
-            <div className="mt-2 text-xs text-slate-400">
-              {config.sulfurSupply === 100 && '✅ Normal (100 T/h max)'}
-              {config.sulfurSupply === 50 && '⚠️ Low Supply (50 T/h max)'}
-              {config.sulfurSupply === 0 && '🔴 Sulfur Offline (0 T/h)'}
+            <div className="mt-2 text-xs text-ocp-300">
+              {config.sulfurSupply === 100 && 'Normal (100 T/h max)'}
+              {config.sulfurSupply === 50 && 'Low Supply (50 T/h max)'}
+              {config.sulfurSupply === 0 && 'Sulfur Offline (0 T/h)'}
             </div>
           </div>
         </div>
 
         {/* Machine Availability */}
         <div>
-          <h3 className="text-sm font-semibold text-slate-300 mb-4 uppercase tracking-wide flex items-center gap-2">
-            <Icon name="agent-selector" size={16} color="primary" />
+          <h3 className="text-sm font-semibold text-ocp-300 mb-4 uppercase tracking-wide flex items-center gap-2">
+            <Icon name="agent-selector" size={16} color="accent" />
             Machine Availability
           </h3>
           
@@ -307,16 +301,16 @@ export const ScenarioBuilder: React.FC<ScenarioBuilderProps> = ({
                   className={`
                     flex items-center justify-between p-4 rounded-lg border transition-all
                     ${isAvailable 
-                      ? 'bg-slate-800/50 border-slate-700' 
-                      : 'bg-rose-500/5 border-rose-500/30'
+                      ? 'bg-ocp-800/50 border-ocp-400/30' 
+                      : 'bg-status-danger-muted border-status-danger/30'
                     }
                   `}
                 >
                   <div className="flex items-center gap-3">
-                    <Icon name="agent-selector" size={20} color={isAvailable ? 'primary' : 'secondary'} />
+                    <Icon name="agent-selector" size={20} color={isAvailable ? 'accent' : 'secondary'} />
                     <div>
-                      <div className="text-sm font-medium text-slate-200">GTA {num}</div>
-                      <div className="text-xs text-slate-500">
+                      <div className="text-sm font-medium text-ocp-cream">GTA {num}</div>
+                      <div className="text-xs text-ocp-400">
                         {isAvailable ? 'Available' : 'Maintenance Mode'}
                       </div>
                     </div>
@@ -325,7 +319,7 @@ export const ScenarioBuilder: React.FC<ScenarioBuilderProps> = ({
                     onClick={() => updateConfig({ [key]: !isAvailable })}
                     className={`
                       relative w-12 h-6 rounded-full transition-colors
-                      ${isAvailable ? 'bg-emerald-500' : 'bg-slate-600'}
+                      ${isAvailable ? 'bg-ocp-accent' : 'bg-ocp-600'}
                     `}
                   >
                     <div
@@ -343,21 +337,21 @@ export const ScenarioBuilder: React.FC<ScenarioBuilderProps> = ({
       </div>
 
       {/* Footer: Run Button */}
-      <div className="p-6 border-t border-slate-800">
+      <div className="p-6 border-t border-ocp-400/30">
         <button
           onClick={() => onRunSimulation(config)}
           disabled={isSimulating}
           className={`
             w-full py-4 rounded-lg font-bold text-lg transition-all
             ${isSimulating
-              ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
-              : 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:from-emerald-500 hover:to-emerald-400 shadow-lg hover:shadow-emerald-500/50'
+              ? 'bg-ocp-700 text-ocp-400 cursor-not-allowed'
+              : 'bg-gradient-to-r from-ocp-accent to-ocp-accent-hover text-primary-dark hover:shadow-lg hover:shadow-ocp-accent/30'
             }
           `}
         >
           {isSimulating ? (
             <span className="flex items-center justify-center gap-2">
-              <div className="w-5 h-5 border-2 border-slate-500 border-t-transparent rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-ocp-400 border-t-transparent rounded-full animate-spin" />
               Running Simulation...
             </span>
           ) : (

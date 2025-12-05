@@ -123,52 +123,52 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
   const getEventStyle = (type: ActionEvent['type']) => {
     switch (type) {
       case 'CRITICAL':
-        return 'border-l-rose-500 bg-rose-500/5 text-rose-400';
+        return 'border-l-status-danger bg-status-danger-muted text-status-danger';
       case 'WARN':
-        return 'border-l-amber-500 bg-amber-500/5 text-amber-400';
+        return 'border-l-status-warning bg-status-warning-muted text-status-warning';
       case 'SUCCESS':
-        return 'border-l-emerald-500 bg-emerald-500/5 text-emerald-400';
+        return 'border-l-ocp-accent bg-ocp-accent/10 text-ocp-accent';
       case 'AI':
-        return 'border-l-purple-500 bg-purple-500/5 text-purple-400';
+        return 'border-l-ocp-500 bg-ocp-500/10 text-ocp-300';
       default:
-        return 'border-l-blue-500 bg-blue-500/5 text-blue-400';
+        return 'border-l-status-info bg-status-info-muted text-status-info';
     }
   };
 
   const getEventIcon = (type: ActionEvent['type']) => {
     switch (type) {
       case 'CRITICAL':
-        return '🚨';
+        return '!';
       case 'WARN':
-        return '⚠️';
+        return '!';
       case 'SUCCESS':
         return '✓';
       case 'AI':
-        return '🤖';
+        return '◆';
       default:
-        return 'ℹ️';
+        return 'i';
     }
   };
 
   return (
-    <div className="bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-lg p-3 h-full flex flex-col">
+    <div className="bg-ocp-900/50 backdrop-blur-md border border-ocp-400/30 rounded-lg p-3 h-full flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-800">
+      <div className="flex items-center justify-between mb-3 pb-2 border-b border-ocp-400/30">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+          <div className="w-2 h-2 rounded-full bg-status-info animate-pulse" />
+          <span className="text-xs font-semibold text-ocp-300 uppercase tracking-wide">
             Live Event Feed
           </span>
         </div>
-        <div className="text-[10px] text-slate-600">
+        <div className="text-[10px] text-ocp-400">
           {events.length} events
         </div>
       </div>
 
       {/* Events List */}
-      <div className="flex-1 overflow-y-auto space-y-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+      <div className="flex-1 overflow-y-auto space-y-2 scrollbar-thin scrollbar-thumb-ocp-600 scrollbar-track-transparent">
         {events.length === 0 ? (
-          <div className="text-center py-8 text-slate-600 text-xs">
+          <div className="text-center py-8 text-ocp-400 text-xs">
             Monitoring system events...
           </div>
         ) : (
@@ -179,12 +179,12 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
             >
               <div className="flex items-start justify-between gap-2 mb-1">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-sm">{getEventIcon(event.type)}</span>
+                  <span className="text-sm font-bold">{getEventIcon(event.type)}</span>
                   <span className="font-semibold text-[10px] uppercase tracking-wide opacity-80">
                     {event.type}
                   </span>
                 </div>
-                <span className="text-[9px] text-slate-600 font-mono">
+                <span className="text-[9px] text-ocp-400 font-mono">
                   {event.timestamp.toLocaleTimeString('en-US', { 
                     hour: '2-digit', 
                     minute: '2-digit', 
@@ -201,7 +201,7 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
       </div>
 
       {/* Footer */}
-      <div className="mt-3 pt-2 border-t border-slate-800 text-[10px] text-slate-600 text-center">
+      <div className="mt-3 pt-2 border-t border-ocp-400/30 text-[10px] text-ocp-400 text-center">
         Auto-refresh every 5s
       </div>
     </div>

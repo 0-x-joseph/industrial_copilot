@@ -28,19 +28,19 @@ const GTACard: React.FC<{ gta: GTAData }> = ({ gta }) => {
 
   return (
     <div className={`
-      bg-slate-900/50 backdrop-blur-md border rounded-lg p-4 
-      transition-all duration-300
-      ${isRunning ? 'border-l-4 border-l-emerald-500' : 'border-l-4 border-l-slate-700'}
+      bg-ocp-900/50 backdrop-blur-md border rounded-lg p-4 
+      transition-all duration-300 border-ocp-400/30
+      ${isRunning ? 'border-l-4 border-l-ocp-accent' : 'border-l-4 border-l-ocp-600'}
     `}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           {/* Turbine Icon */}
-          <div className={`w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center ${
+          <div className={`w-8 h-8 rounded-lg bg-status-info/10 flex items-center justify-center ${
             isRunning ? 'animate-pulse' : ''
           }`}>
             <svg 
-              className={`w-5 h-5 ${isRunning ? 'text-blue-400' : 'text-slate-600'}`}
+              className={`w-5 h-5 ${isRunning ? 'text-status-info' : 'text-ocp-400'}`}
               fill="currentColor"
               viewBox="0 0 24 24"
             >
@@ -48,12 +48,12 @@ const GTACard: React.FC<{ gta: GTAData }> = ({ gta }) => {
             </svg>
           </div>
           <div>
-            <h4 className="text-sm font-bold text-slate-200">{gta.name}</h4>
-            <p className="text-[10px] text-slate-500">Turbo-Alternator</p>
+            <h4 className="text-sm font-bold text-ocp-cream">{gta.name}</h4>
+            <p className="text-[10px] text-ocp-400">Turbo-Alternator</p>
           </div>
         </div>
         <div className={`w-3 h-3 rounded-full ${
-          isRunning ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'
+          isRunning ? 'bg-ocp-accent animate-pulse' : 'bg-ocp-600'
         }`} />
       </div>
 
@@ -62,15 +62,15 @@ const GTACard: React.FC<{ gta: GTAData }> = ({ gta }) => {
         {/* Power Bar */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[10px] text-slate-500 uppercase">Power</span>
-            <span className="text-xs font-mono font-bold text-blue-400">{gta.power.toFixed(1)}</span>
+            <span className="text-[10px] text-ocp-400 uppercase">Power</span>
+            <span className="text-xs font-mono font-bold text-status-info">{gta.power.toFixed(1)}</span>
           </div>
-          <div className="h-24 bg-slate-800/50 rounded-lg overflow-hidden relative">
+          <div className="h-24 bg-ocp-800/50 rounded-lg overflow-hidden relative">
             <div 
-              className="absolute bottom-0 w-full bg-gradient-to-t from-blue-500 to-blue-400 transition-all duration-500"
+              className="absolute bottom-0 w-full bg-gradient-to-t from-status-info to-status-info/70 transition-all duration-500"
               style={{ height: `${powerPercent}%` }}
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-blue-400/50 to-transparent animate-pulse" />
+              <div className="absolute inset-0 bg-gradient-to-t from-status-info/50 to-transparent animate-pulse" />
             </div>
             <div className="absolute inset-0 flex items-end justify-center pb-2">
               <span className="text-[10px] font-mono font-bold text-white drop-shadow-lg">
@@ -78,21 +78,21 @@ const GTACard: React.FC<{ gta: GTAData }> = ({ gta }) => {
               </span>
             </div>
           </div>
-          <div className="text-center text-[10px] text-slate-600 mt-1">MW</div>
+          <div className="text-center text-[10px] text-ocp-400 mt-1">MW</div>
         </div>
 
         {/* Steam Bar */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[10px] text-slate-500 uppercase">Steam Out</span>
-            <span className="text-xs font-mono font-bold text-purple-400">{gta.steam.toFixed(1)}</span>
+            <span className="text-[10px] text-ocp-400 uppercase">Steam Out</span>
+            <span className="text-xs font-mono font-bold text-ocp-accent">{gta.steam.toFixed(1)}</span>
           </div>
-          <div className="h-24 bg-slate-800/50 rounded-lg overflow-hidden relative">
+          <div className="h-24 bg-ocp-800/50 rounded-lg overflow-hidden relative">
             <div 
-              className="absolute bottom-0 w-full bg-gradient-to-t from-purple-500 to-purple-400 transition-all duration-500"
+              className="absolute bottom-0 w-full bg-gradient-to-t from-ocp-accent to-ocp-accent/70 transition-all duration-500"
               style={{ height: `${steamPercent}%` }}
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-purple-400/50 to-transparent animate-pulse" />
+              <div className="absolute inset-0 bg-gradient-to-t from-ocp-accent/50 to-transparent animate-pulse" />
             </div>
             <div className="absolute inset-0 flex items-end justify-center pb-2">
               <span className="text-[10px] font-mono font-bold text-white drop-shadow-lg">
@@ -100,25 +100,25 @@ const GTACard: React.FC<{ gta: GTAData }> = ({ gta }) => {
               </span>
             </div>
           </div>
-          <div className="text-center text-[10px] text-slate-600 mt-1">T/h</div>
+          <div className="text-center text-[10px] text-ocp-400 mt-1">T/h</div>
         </div>
       </div>
 
       {/* Footer - Efficiency KPI */}
-      <div className="pt-3 border-t border-slate-800">
+      <div className="pt-3 border-t border-ocp-400/30">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] text-slate-500 uppercase">Efficiency</span>
+          <span className="text-[10px] text-ocp-400 uppercase">Efficiency</span>
           <div className="flex items-center gap-2">
             <span className={`text-sm font-mono font-bold ${
-              efficiency > 0.2 ? 'text-emerald-400' : 'text-slate-600'
+              efficiency > 0.2 ? 'text-ocp-accent' : 'text-ocp-400'
             }`}>
               {efficiency.toFixed(2)}
             </span>
-            <span className="text-[10px] text-slate-600">MW/T</span>
+            <span className="text-[10px] text-ocp-400">MW/T</span>
           </div>
         </div>
-        <div className="mt-1 text-[10px] text-slate-600">
-          Admission: <span className="text-slate-400 font-mono">{gta.admission.toFixed(0)} T/h</span>
+        <div className="mt-1 text-[10px] text-ocp-400">
+          Admission: <span className="text-ocp-300 font-mono">{gta.admission.toFixed(0)} T/h</span>
         </div>
       </div>
     </div>
@@ -134,11 +134,11 @@ export const GTAFleet: React.FC<GTAFleetProps> = ({ gta1, gta2, gta3 }) => {
       {/* Fleet Header */}
       <div className="mb-3 flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wide">
+          <h3 className="text-sm font-semibold text-ocp-300 uppercase tracking-wide">
             GTA Fleet Status
           </h3>
-          <p className="text-[10px] text-slate-500">
-            {activeCount}/3 Active • Total Output: <span className="text-emerald-400 font-mono font-bold">{totalPower.toFixed(1)} MW</span>
+          <p className="text-[10px] text-ocp-400">
+            {activeCount}/3 Active • Total Output: <span className="text-ocp-accent font-mono font-bold">{totalPower.toFixed(1)} MW</span>
           </p>
         </div>
       </div>

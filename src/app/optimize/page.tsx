@@ -30,23 +30,33 @@ const DashboardHeader: React.FC<{
   onDashboard?: () => void;
   apiConnected: boolean;
 }> = ({ onChat, onDashboard, apiConnected }) => {
+  const [currentTime, setCurrentTime] = useState<string | null>(null);
+
+  useEffect(() => {
+    setCurrentTime(new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }));
+    const interval = setInterval(() => {
+      setCurrentTime(new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <header className="flex items-center justify-between px-4 py-2.5 bg-slate-900 text-white shadow-lg border-b border-slate-800">
+    <header className="flex items-center justify-between px-4 py-2.5 bg-ocp-900 text-ocp-cream shadow-lg border-b border-ocp-400/30">
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-lg">
+          <div className="w-8 h-8 bg-gradient-to-br from-ocp-accent to-ocp-500 rounded-lg flex items-center justify-center shadow-lg">
             <Icon name="dashboard-tab" size={20} color="inverse" />
           </div>
           <span className="text-lg font-bold">Energy Copilot</span>
-          <span className="px-2 py-0.5 bg-purple-500/20 text-purple-400 text-xs font-semibold rounded border border-purple-500/30">
+          <span className="px-2 py-0.5 bg-ocp-500/20 text-ocp-300 text-xs font-semibold rounded border border-ocp-500/30">
             SIMULATION LAB
           </span>
         </div>
         
         {/* Status Indicator */}
-        <div className="flex items-center gap-2 px-3 py-1 bg-slate-800 rounded-lg border border-slate-700">
-          <div className={`w-2 h-2 rounded-full ${apiConnected ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'}`}></div>
-          <span className="text-xs text-slate-400">
+        <div className="flex items-center gap-2 px-3 py-1 bg-ocp-800 rounded-lg border border-ocp-400/30">
+          <div className={`w-2 h-2 rounded-full ${apiConnected ? 'bg-ocp-accent animate-pulse' : 'bg-status-danger'}`}></div>
+          <span className="text-xs text-ocp-300">
             {apiConnected ? 'Backend Online' : 'Backend Offline'}
           </span>
         </div>
@@ -55,14 +65,14 @@ const DashboardHeader: React.FC<{
         <div className="flex items-center gap-1">
           <button 
             onClick={onChat}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all rounded-lg text-ocp-cream-muted hover:bg-ocp-800 hover:text-ocp-cream"
           >
             <Icon name="agent-selector" size={16} />
             <span>Chat</span>
           </button>
           <button 
             onClick={onDashboard}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all rounded-lg text-ocp-cream-muted hover:bg-ocp-800 hover:text-ocp-cream"
           >
             <Icon name="dashboard-tab" size={16} />
             <span>Monitoring</span>
@@ -71,8 +81,8 @@ const DashboardHeader: React.FC<{
       </div>
       
       <div className="flex items-center gap-2">
-        <div className="text-sm text-slate-400">
-          {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+        <div className="text-sm text-ocp-300">
+          {currentTime ?? '--:--'}
         </div>
       </div>
     </header>
@@ -84,28 +94,28 @@ const DashboardHeader: React.FC<{
  */
 const EmptyState: React.FC = () => {
   return (
-    <div className="h-full flex items-center justify-center bg-slate-900 rounded-lg border border-slate-800">
+    <div className="h-full flex items-center justify-center bg-ocp-900 rounded-lg border border-ocp-400/30">
       <div className="text-center max-w-md">
-        <div className="w-20 h-20 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-slate-700">
-          <Icon name="chart" size={40} color="primary" />
+        <div className="w-20 h-20 bg-gradient-to-br from-ocp-accent/20 to-ocp-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-ocp-400/30">
+          <Icon name="dashboard-tab" size={32} color="accent" />
         </div>
-        <h3 className="text-2xl font-bold text-white mb-3">
+        <h3 className="text-2xl font-bold text-ocp-cream mb-3">
           Ready for Simulation
         </h3>
-        <p className="text-slate-400 mb-6">
-          Configure your scenario on the left, then click <strong className="text-emerald-400">"RUN SIMULATION"</strong> to see optimized results and cost savings.
+        <p className="text-ocp-300 mb-6">
+          Configure your scenario on the left, then click <strong className="text-ocp-accent">&quot;RUN SIMULATION&quot;</strong> to see optimized results and cost savings.
         </p>
-        <div className="flex items-center justify-center gap-4 text-sm text-slate-500">
+        <div className="flex items-center justify-center gap-4 text-sm text-ocp-400">
           <div className="flex items-center gap-2">
-            <Icon name="checkmark" size={16} color="primary" />
+            <Icon name="star" size={16} color="accent" />
             <span>Financial Impact</span>
           </div>
           <div className="flex items-center gap-2">
-            <Icon name="chart" size={16} color="primary" />
+            <Icon name="dashboard-tab" size={16} color="accent" />
             <span>Source Mix</span>
           </div>
           <div className="flex items-center gap-2">
-            <Icon name="list" size={16} color="primary" />
+            <Icon name="commands" size={16} color="accent" />
             <span>Action Plan</span>
           </div>
         </div>
@@ -174,7 +184,7 @@ export default function SimulationLab() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-slate-950">
+    <div className="h-screen flex flex-col bg-ocp-950">
       {/* Header */}
       <DashboardHeader 
         onChat={() => window.location.href = '/test/chat'}
@@ -198,13 +208,13 @@ export default function SimulationLab() {
             {!result ? (
               <EmptyState />
             ) : error ? (
-              <div className="h-full flex items-center justify-center bg-slate-900 rounded-lg border border-rose-500/30">
+              <div className="h-full flex items-center justify-center bg-ocp-900 rounded-lg border border-status-danger/30">
                 <div className="text-center max-w-md">
-                  <div className="w-16 h-16 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Icon name="error" size={32} color="secondary" />
+                  <div className="w-16 h-16 bg-status-danger-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Icon name="minus" size={32} color="secondary" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">Simulation Failed</h3>
-                  <p className="text-rose-400 text-sm">{error}</p>
+                  <h3 className="text-xl font-bold text-ocp-cream mb-2">Simulation Failed</h3>
+                  <p className="text-status-danger text-sm">{error}</p>
                 </div>
               </div>
             ) : (

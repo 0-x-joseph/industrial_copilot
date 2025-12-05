@@ -70,7 +70,7 @@ export const MeritOrderChart: React.FC<MeritOrderChartProps> = ({
           <h3 className="text-lg font-semibold text-[#FFF8D4]">Merit Order Dispatch</h3>
         </div>
         <div className="text-center py-12 text-[#8E9098]">
-          <Icon name="files" size={48} color="secondary" className="mx-auto mb-3 opacity-50" />
+          <Icon name="files" size={32} color="secondary" className="mx-auto mb-3 opacity-50" />
           <p>Run an optimization to see the dispatch strategy</p>
         </div>
       </div>
@@ -252,7 +252,7 @@ export const MeritOrderChart: React.FC<MeritOrderChartProps> = ({
           {/* Warning if boiler is used heavily */}
           {result.boiler_output > 50 && (
             <div className="mt-3 flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
-              <Icon name="warning" size={16} color="secondary" className="mt-0.5 flex-shrink-0" />
+              <Icon name="dot" size={16} color="secondary" className="mt-0.5 flex-shrink-0" />
               <div className="text-sm text-red-400">
                 <strong>High Boiler Usage:</strong> Consider reducing demand or checking GTA availability. 
                 Boiler costs {result.cost_breakdown.boiler.toFixed(0)} DH/hr.

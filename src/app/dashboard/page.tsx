@@ -24,28 +24,37 @@ const ControlRoomHeader: React.FC<{
 }> = ({ onOptimize, costRate, efficiency, pressure, blendedCost }) => {
   const isPressureCritical = pressure < 8.5;
   const isEfficiencyGood = efficiency > 85;
+  const [currentTime, setCurrentTime] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    setCurrentTime(new Date().toLocaleTimeString());
+    const interval = setInterval(() => {
+      setCurrentTime(new Date().toLocaleTimeString());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <header className="h-16 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-6 flex items-center justify-between">
+    <header className="h-16 bg-ocp-900/80 backdrop-blur-md border-b border-ocp-400/30 px-6 flex items-center justify-between">
       {/* Left: Branding */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-blue-600 rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-gradient-to-br from-ocp-accent to-ocp-500 rounded-lg flex items-center justify-center">
             <Icon name="dashboard-tab" size={16} color="inverse" />
           </div>
           <div>
-            <h1 className="text-sm font-bold text-slate-100">Energy Copilot</h1>
-            <p className="text-[10px] text-slate-500">Industrial Control Room</p>
+            <h1 className="text-sm font-bold text-ocp-cream">Energy Copilot</h1>
+            <p className="text-[10px] text-ocp-300">Industrial Control Room</p>
           </div>
         </div>
 
-        <div className="h-6 w-px bg-slate-700" />
+        <div className="h-6 w-px bg-ocp-400/30" />
 
         <button
           onClick={onOptimize}
-          className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium transition-all rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700 hover:border-emerald-500"
+          className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium transition-all rounded-lg bg-ocp-800 text-ocp-cream-muted hover:bg-ocp-700 hover:text-ocp-cream border border-ocp-400/30 hover:border-ocp-accent"
         >
-          <Icon name="settings" size={16} color="primary" />
+          <Icon name="settings" size={16} color="accent" />
           <span>Optimize</span>
         </button>
       </div>
@@ -54,59 +63,59 @@ const ControlRoomHeader: React.FC<{
       <div className="flex items-center gap-6">
         {/* Cost Rate */}
         <div className="flex flex-col items-center">
-          <div className="text-[10px] text-slate-500 uppercase tracking-wide mb-0.5">Cost Rate</div>
-          <div className="text-2xl font-mono font-bold text-white">
+          <div className="text-[10px] text-ocp-300 uppercase tracking-wide mb-0.5">Cost Rate</div>
+          <div className="text-2xl font-mono font-bold text-ocp-cream">
             {(costRate / 1000).toFixed(0)}
-            <span className="text-xs text-slate-500 ml-1">k DH/h</span>
+            <span className="text-xs text-ocp-300 ml-1">k DH/h</span>
           </div>
         </div>
 
-        <div className="h-10 w-px bg-slate-800" />
+        <div className="h-10 w-px bg-ocp-400/20" />
 
         {/* Blended Steam Cost */}
         <div className="flex flex-col items-center">
-          <div className="text-[10px] text-slate-500 uppercase tracking-wide mb-0.5">Steam Cost</div>
-          <div className={`text-2xl font-mono font-bold ${blendedCost < 100 ? 'text-emerald-400' : 'text-amber-400'}`}>
+          <div className="text-[10px] text-ocp-300 uppercase tracking-wide mb-0.5">Steam Cost</div>
+          <div className={`text-2xl font-mono font-bold ${blendedCost < 100 ? 'text-status-success' : 'text-status-warning'}`}>
             {blendedCost.toFixed(0)}
-            <span className="text-xs text-slate-500 ml-1">DH/T</span>
+            <span className="text-xs text-ocp-300 ml-1">DH/T</span>
           </div>
         </div>
 
-        <div className="h-10 w-px bg-slate-800" />
+        <div className="h-10 w-px bg-ocp-400/20" />
 
         {/* Efficiency */}
         <div className="flex flex-col items-center">
-          <div className="text-[10px] text-slate-500 uppercase tracking-wide mb-0.5">Efficiency</div>
-          <div className={`text-2xl font-mono font-bold ${isEfficiencyGood ? 'text-emerald-400' : 'text-amber-400'}`}>
+          <div className="text-[10px] text-ocp-300 uppercase tracking-wide mb-0.5">Efficiency</div>
+          <div className={`text-2xl font-mono font-bold ${isEfficiencyGood ? 'text-status-success' : 'text-status-warning'}`}>
             {efficiency.toFixed(1)}
-            <span className="text-xs text-slate-500 ml-1">%</span>
+            <span className="text-xs text-ocp-300 ml-1">%</span>
           </div>
         </div>
 
-        <div className="h-10 w-px bg-slate-800" />
+        <div className="h-10 w-px bg-ocp-400/20" />
 
         {/* MP Pressure */}
         <div className="flex flex-col items-center">
-          <div className="text-[10px] text-slate-500 uppercase tracking-wide mb-0.5">MP Pressure</div>
+          <div className="text-[10px] text-ocp-300 uppercase tracking-wide mb-0.5">MP Pressure</div>
           <div className={`text-2xl font-mono font-bold ${
-            isPressureCritical ? 'text-rose-400 animate-pulse' : 
-            pressure < 9.0 ? 'text-amber-400' : 
-            'text-emerald-400'
+            isPressureCritical ? 'text-status-danger animate-pulse' : 
+            pressure < 9.0 ? 'text-status-warning' : 
+            'text-status-success'
           }`}>
             {pressure.toFixed(2)}
-            <span className="text-xs text-slate-500 ml-1">bar</span>
+            <span className="text-xs text-ocp-300 ml-1">bar</span>
           </div>
         </div>
       </div>
 
       {/* Right: Status */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
-          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-xs font-medium text-emerald-400">Live</span>
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-status-success-muted border border-status-success/30 rounded-lg">
+          <div className="w-2 h-2 rounded-full bg-status-success animate-pulse" />
+          <span className="text-xs font-medium text-status-success">Live</span>
         </div>
-        <div className="text-[10px] text-slate-600 font-mono">
-          {new Date().toLocaleTimeString()}
+        <div className="text-[10px] text-ocp-400 font-mono">
+          {currentTime ?? '--:--:--'}
         </div>
       </div>
     </header>
@@ -143,17 +152,17 @@ export default function ControlRoomDashboard() {
 
   if (isLoading && !liveData) {
     return (
-      <div className="h-screen flex items-center justify-center bg-slate-950">
+      <div className="h-screen flex items-center justify-center bg-ocp-950">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-slate-400">Initializing Control Room...</p>
+          <div className="w-16 h-16 border-4 border-ocp-accent border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-ocp-300">Initializing Control Room...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="h-screen flex flex-col bg-slate-950 text-slate-100">
+    <div className="h-screen flex flex-col bg-ocp-950 text-ocp-cream">
       {/* Top Bar - Fixed 64px */}
       <ControlRoomHeader
         onOptimize={handleNavigateToOptimize}
@@ -183,8 +192,8 @@ export default function ControlRoomDashboard() {
                     criticalThreshold={8.5}
                   />
                 ) : (
-                  <div className="bg-slate-900/50 rounded-lg border border-slate-800 h-full flex items-center justify-center">
-                    <p className="text-slate-500 text-sm">Loading gauge...</p>
+                  <div className="bg-ocp-900/50 rounded-lg border border-ocp-400/30 h-full flex items-center justify-center">
+                    <p className="text-ocp-300 text-sm">Loading gauge...</p>
                   </div>
                 )}
               </div>
@@ -216,8 +225,8 @@ export default function ControlRoomDashboard() {
                     }}
                   />
                 ) : (
-                  <div className="bg-slate-900/50 rounded-lg border border-slate-800 h-full flex items-center justify-center">
-                    <p className="text-slate-500 text-sm">Loading GTA fleet...</p>
+                  <div className="bg-ocp-900/50 rounded-lg border border-ocp-400/30 h-full flex items-center justify-center">
+                    <p className="text-ocp-300 text-sm">Loading GTA fleet...</p>
                   </div>
                 )}
               </div>
@@ -245,51 +254,51 @@ export default function ControlRoomDashboard() {
             )}
 
             {/* GTA Status Compact */}
-            <div className="bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-lg p-3">
-              <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">
+            <div className="bg-ocp-900/50 backdrop-blur-md border border-ocp-400/30 rounded-lg p-3">
+              <div className="text-xs font-semibold text-ocp-300 uppercase tracking-wide mb-3">
                 Power Generation
               </div>
               <div className="space-y-2">
                 {/* GTA 1 */}
-                <div className="flex items-center justify-between p-2 bg-slate-800/50 rounded">
+                <div className="flex items-center justify-between p-2 bg-ocp-800/50 rounded">
                   <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-xs text-slate-400">GTA 1</span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-status-success animate-pulse" />
+                    <span className="text-xs text-ocp-300">GTA 1</span>
                   </div>
-                  <div className="text-sm font-mono font-bold text-blue-400">
+                  <div className="text-sm font-mono font-bold text-status-info">
                     {liveData?.gta_operations.gta1.power.toFixed(1) || '0.0'}
-                    <span className="text-[10px] text-slate-500 ml-1">MW</span>
+                    <span className="text-[10px] text-ocp-400 ml-1">MW</span>
                   </div>
                 </div>
 
                 {/* GTA 2 */}
-                <div className="flex items-center justify-between p-2 bg-slate-800/50 rounded">
+                <div className="flex items-center justify-between p-2 bg-ocp-800/50 rounded">
                   <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-xs text-slate-400">GTA 2</span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-status-success animate-pulse" />
+                    <span className="text-xs text-ocp-300">GTA 2</span>
                   </div>
-                  <div className="text-sm font-mono font-bold text-blue-400">
+                  <div className="text-sm font-mono font-bold text-status-info">
                     {liveData?.gta_operations.gta2.power.toFixed(1) || '0.0'}
-                    <span className="text-[10px] text-slate-500 ml-1">MW</span>
+                    <span className="text-[10px] text-ocp-400 ml-1">MW</span>
                   </div>
                 </div>
 
                 {/* GTA 3 */}
-                <div className="flex items-center justify-between p-2 bg-slate-800/50 rounded">
+                <div className="flex items-center justify-between p-2 bg-ocp-800/50 rounded">
                   <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-xs text-slate-400">GTA 3</span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-status-success animate-pulse" />
+                    <span className="text-xs text-ocp-300">GTA 3</span>
                   </div>
-                  <div className="text-sm font-mono font-bold text-blue-400">
+                  <div className="text-sm font-mono font-bold text-status-info">
                     {liveData?.gta_operations.gta3.power.toFixed(1) || '0.0'}
-                    <span className="text-[10px] text-slate-500 ml-1">MW</span>
+                    <span className="text-[10px] text-ocp-400 ml-1">MW</span>
                   </div>
                 </div>
 
                 {/* Total */}
-                <div className="flex items-center justify-between p-2 bg-emerald-500/10 rounded border border-emerald-500/30 mt-2">
-                  <span className="text-xs font-semibold text-emerald-400">Total</span>
-                  <div className="text-lg font-mono font-bold text-emerald-400">
+                <div className="flex items-center justify-between p-2 bg-ocp-accent/10 rounded border border-ocp-accent/30 mt-2">
+                  <span className="text-xs font-semibold text-ocp-accent">Total</span>
+                  <div className="text-lg font-mono font-bold text-ocp-accent">
                     {liveData?.total_power_generated.toFixed(1) || '0.0'}
                     <span className="text-[10px] ml-1">MW</span>
                   </div>
@@ -298,8 +307,8 @@ export default function ControlRoomDashboard() {
             </div>
 
             {/* Steam Economics Compact */}
-            <div className="bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-lg p-3">
-              <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">
+            <div className="bg-ocp-900/50 backdrop-blur-md border border-ocp-400/30 rounded-lg p-3">
+              <div className="text-xs font-semibold text-ocp-300 uppercase tracking-wide mb-3">
                 Steam Source Mix
               </div>
               {liveData && (
@@ -307,10 +316,10 @@ export default function ControlRoomDashboard() {
                   {/* Sulfur (Free) */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                      <span className="text-xs text-slate-400">Sulfur (Free)</span>
+                      <div className="w-2 h-2 rounded-full bg-status-success" />
+                      <span className="text-xs text-ocp-300">Sulfur (Free)</span>
                     </div>
-                    <div className="text-xs font-mono font-bold text-emerald-400">
+                    <div className="text-xs font-mono font-bold text-status-success">
                       {liveData.steam_economics?.source_breakdown.sulfur_percent.toFixed(0)}%
                     </div>
                   </div>
@@ -318,10 +327,10 @@ export default function ControlRoomDashboard() {
                   {/* GTA Extraction */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-blue-500" />
-                      <span className="text-xs text-slate-400">GTA Extract</span>
+                      <div className="w-2 h-2 rounded-full bg-status-info" />
+                      <span className="text-xs text-ocp-300">GTA Extract</span>
                     </div>
-                    <div className="text-xs font-mono font-bold text-blue-400">
+                    <div className="text-xs font-mono font-bold text-status-info">
                       {liveData.steam_economics?.source_breakdown.gta_percent.toFixed(0)}%
                     </div>
                   </div>
@@ -329,11 +338,11 @@ export default function ControlRoomDashboard() {
                   {/* Boiler (Expensive) */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-rose-500" />
-                      <span className="text-xs text-slate-400">Boiler (284 DH/T)</span>
+                      <div className="w-2 h-2 rounded-full bg-status-danger" />
+                      <span className="text-xs text-ocp-300">Boiler (284 DH/T)</span>
                     </div>
                     <div className={`text-xs font-mono font-bold ${
-                      liveData.steam_economics?.source_breakdown.boiler_percent > 0 ? 'text-rose-400' : 'text-slate-600'
+                      liveData.steam_economics?.source_breakdown.boiler_percent > 0 ? 'text-status-danger' : 'text-ocp-400'
                     }`}>
                       {liveData.steam_economics?.source_breakdown.boiler_percent.toFixed(0)}%
                     </div>
@@ -358,15 +367,15 @@ export default function ControlRoomDashboard() {
 
           {/* Error Display */}
           {error && (
-            <div className="col-span-12 bg-rose-500/10 border border-rose-500/30 rounded-lg p-3">
+            <div className="col-span-12 bg-status-danger-muted border border-status-danger/30 rounded-lg p-3">
               <div className="flex items-start gap-2">
-                <div className="text-rose-400 text-sm">⚠️</div>
+                <div className="text-status-danger text-sm">⚠️</div>
                 <div>
-                  <div className="text-rose-400 font-semibold text-sm">Connection Error</div>
-                  <div className="text-rose-300 text-xs mt-1">{error}</div>
+                  <div className="text-status-danger font-semibold text-sm">Connection Error</div>
+                  <div className="text-status-danger/80 text-xs mt-1">{error}</div>
                   <button
                     onClick={refresh}
-                    className="mt-2 text-xs text-rose-400 underline hover:text-rose-300"
+                    className="mt-2 text-xs text-status-danger underline hover:text-status-danger/80"
                   >
                     Retry Connection
                   </button>

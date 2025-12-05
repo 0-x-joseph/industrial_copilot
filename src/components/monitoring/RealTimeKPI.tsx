@@ -80,7 +80,7 @@ export const RealTimeKPI: React.FC<RealTimeKPIProps> = ({ data, isLoading }) => 
       value: data.cost_per_hour,
       unit: 'DH/hr',
       decimals: 0,
-      icon: 'currency' as const,
+      icon: 'star' as const,
       color: '#FFD966',
       trend: data.free_energy_percent > 10 ? 'down' : 'stable',
       subtitle: `${((data.cost_per_hour / 1000) * 24).toFixed(0)}k DH/day`
@@ -90,7 +90,7 @@ export const RealTimeKPI: React.FC<RealTimeKPIProps> = ({ data, isLoading }) => 
       value: data.co2_emissions_kg_per_hour / 1000,
       unit: 'tons/hr',
       decimals: 1,
-      icon: 'warning' as const,
+      icon: 'dot' as const,
       color: data.co2_emissions_kg_per_hour > 150000 ? '#E86C5D' : '#A3B087',
       trend: data.co2_emissions_kg_per_hour > 150000 ? 'up' : 'down',
       subtitle: `${((data.co2_emissions_kg_per_hour / 1000) * 24).toFixed(0)} tons/day`
@@ -110,7 +110,7 @@ export const RealTimeKPI: React.FC<RealTimeKPIProps> = ({ data, isLoading }) => 
       value: data.free_energy_percent,
       unit: '%',
       decimals: 1,
-      icon: 'sparkles' as const,
+      icon: 'send' as const,
       color: '#A3B087',
       trend: data.free_energy_percent > 12 ? 'up' : 'stable',
       subtitle: 'From sulfur recovery'

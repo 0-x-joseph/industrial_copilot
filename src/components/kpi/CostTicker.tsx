@@ -105,7 +105,7 @@ export const CostTicker: React.FC<CostTickerProps> = ({
           <h3 className="text-lg font-semibold text-[#FFF8D4]">Cost Analysis</h3>
         </div>
         <div className="text-center py-8 text-[#8E9098]">
-          <Icon name="files" size={48} color="secondary" className="mx-auto mb-3 opacity-50" />
+          <Icon name="files" size={32} color="secondary" className="mx-auto mb-3 opacity-50" />
           <p>Run an optimization to see cost savings</p>
         </div>
       </div>
@@ -127,7 +127,7 @@ export const CostTicker: React.FC<CostTickerProps> = ({
           {showBreakdown ? 'Hide' : 'Show'} Breakdown
           <Icon 
             name="dropdown" 
-            size={14} 
+            size={16} 
             color="primary" 
             className={`transition-transform ${showBreakdown ? 'rotate-180' : ''}`}
           />
@@ -141,7 +141,7 @@ export const CostTicker: React.FC<CostTickerProps> = ({
             Hourly Savings
           </div>
           <div className="flex items-center justify-center gap-3 mb-2">
-            <Icon name="success" size={32} color="primary" />
+            <Icon name="star" size={32} color="primary" />
             <div className="text-5xl font-bold text-[#A3B087]">
               {formatCurrency(animatedSavings)}
               <span className="text-2xl ml-2">DH/hr</span>
@@ -267,7 +267,7 @@ export const CostTicker: React.FC<CostTickerProps> = ({
       {/* Efficiency Badge */}
       {savingsPercentage > 15 && (
         <div className="mt-4 p-3 bg-[#A3B087]/10 border border-[#A3B087]/30 rounded-lg flex items-center gap-2">
-          <Icon name="success" size={16} color="primary" />
+          <Icon name="star" size={16} color="primary" />
           <span className="text-[#A3B087] text-sm font-medium">
             High efficiency optimization achieved!
           </span>

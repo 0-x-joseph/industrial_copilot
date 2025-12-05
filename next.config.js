@@ -1,10 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
-  },
+  // images config for external domains if needed
   images: {
     domains: ['localhost'],
+    unoptimized: true, // Required for static export if using it
   },
   // Enable SVG imports
   webpack(config) {
@@ -14,4 +13,10 @@ const nextConfig = {
     });
     return config;
   },
+  // Environment variables available to the browser
+  env: {
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+  },
 }
+
+module.exports = nextConfig;

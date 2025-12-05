@@ -23,20 +23,24 @@ export const PressureHeartbeat: React.FC<PressureHeartbeatProps> = ({
     });
   }, [currentPressure]);
 
+  // Brand-aligned colors
+  const successColor = '#A3B087';  // ocp-accent
+  const dangerColor = '#C47070';   // status-danger
+
   return (
-    <div className="bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-lg p-3">
+    <div className="bg-ocp-900/50 backdrop-blur-md border border-ocp-400/30 rounded-lg p-3">
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full ${isCritical ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'}`} />
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+          <div className={`w-2 h-2 rounded-full ${isCritical ? 'bg-status-danger animate-pulse' : 'bg-ocp-accent'}`} />
+          <span className="text-xs font-semibold text-ocp-300 uppercase tracking-wide">
             MP Steam Pressure
           </span>
         </div>
         <div className={`text-xs px-2 py-0.5 rounded ${
           isCritical 
-            ? 'bg-rose-500/20 text-rose-400 border border-rose-500/50' 
-            : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50'
+            ? 'bg-status-danger-muted text-status-danger border border-status-danger/50' 
+            : 'bg-ocp-accent/20 text-ocp-accent border border-ocp-accent/50'
         }`}>
           {isCritical ? 'CRITICAL' : 'STABLE'}
         </div>
@@ -45,12 +49,12 @@ export const PressureHeartbeat: React.FC<PressureHeartbeatProps> = ({
       {/* Large Display */}
       <div className="mb-2">
         <div className={`text-3xl font-mono font-bold ${
-          isCritical ? 'text-rose-400' : 'text-emerald-400'
+          isCritical ? 'text-status-danger' : 'text-ocp-accent'
         }`}>
           {currentPressure.toFixed(2)}
-          <span className="text-sm text-slate-500 ml-2">bar</span>
+          <span className="text-sm text-ocp-400 ml-2">bar</span>
         </div>
-        <div className="text-[10px] text-slate-500">
+        <div className="text-[10px] text-ocp-400">
           Target: &gt; {criticalThreshold} bar
         </div>
       </div>
@@ -66,7 +70,7 @@ export const PressureHeartbeat: React.FC<PressureHeartbeatProps> = ({
             <Line
               type="monotone"
               dataKey="value"
-              stroke={isCritical ? '#ef4444' : '#10b981'}
+              stroke={isCritical ? dangerColor : successColor}
               strokeWidth={2}
               dot={false}
               animationDuration={300}
@@ -76,7 +80,7 @@ export const PressureHeartbeat: React.FC<PressureHeartbeatProps> = ({
             <Line
               type="monotone"
               dataKey={() => criticalThreshold}
-              stroke="#64748b"
+              stroke="#5a6d7a"
               strokeWidth={1}
               strokeDasharray="3 3"
               dot={false}
@@ -86,22 +90,22 @@ export const PressureHeartbeat: React.FC<PressureHeartbeatProps> = ({
       </div>
 
       {/* Footer Stats */}
-      <div className="flex justify-between text-[10px] text-slate-500 mt-2 pt-2 border-t border-slate-800">
+      <div className="flex justify-between text-[10px] text-ocp-400 mt-2 pt-2 border-t border-ocp-400/30">
         <div>
-          <span className="text-slate-600">Min:</span>{' '}
-          <span className="text-slate-400 font-mono">
+          <span className="text-ocp-500">Min:</span>{' '}
+          <span className="text-ocp-300 font-mono">
             {history.length > 0 ? Math.min(...history.map(h => h.value)).toFixed(2) : '--'}
           </span>
         </div>
         <div>
-          <span className="text-slate-600">Max:</span>{' '}
-          <span className="text-slate-400 font-mono">
+          <span className="text-ocp-500">Max:</span>{' '}
+          <span className="text-ocp-300 font-mono">
             {history.length > 0 ? Math.max(...history.map(h => h.value)).toFixed(2) : '--'}
           </span>
         </div>
         <div>
-          <span className="text-slate-600">Avg:</span>{' '}
-          <span className="text-slate-400 font-mono">
+          <span className="text-ocp-500">Avg:</span>{' '}
+          <span className="text-ocp-300 font-mono">
             {history.length > 0 
               ? (history.reduce((sum, h) => sum + h.value, 0) / history.length).toFixed(2)
               : '--'

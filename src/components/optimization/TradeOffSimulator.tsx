@@ -33,7 +33,7 @@ export const TradeOffSimulator: React.FC<TradeOffSimulatorProps> = ({
 
     return {
       steamTarget,
-      steamDelta,
+      steamDelta: steamDelta.toFixed(2),
       powerLoss: powerLoss.toFixed(2),
       gridImport: gridImportIncrease.toFixed(2),
       gridCostChange: gridCostIncrease.toFixed(0),
@@ -186,7 +186,7 @@ export const TradeOffSimulator: React.FC<TradeOffSimulatorProps> = ({
           {/* Warning if major change */}
           {Math.abs(parseFloat(currentTradeOff.steamDelta)) > 50 && (
             <div className="flex items-start gap-2 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
-              <Icon name="warning" size={14} color="secondary" />
+              <Icon name="dot" size={16} color="secondary" />
               <div className="text-xs">
                 <div className="text-amber-400 font-semibold">Large Steam Change</div>
                 <div className="text-amber-300/80 mt-0.5">

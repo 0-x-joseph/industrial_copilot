@@ -48,21 +48,31 @@ class PlantDataStreamer:
     
     def _find_data_file(self) -> str:
         """Find DATA_FINAL.csv in the project"""
+        # Get the directory where this file is located
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        backend_dir = os.path.dirname(current_dir)  # backend/
+        project_root = os.path.dirname(backend_dir)  # project root
+        
         possible_paths = [
+            os.path.join(project_root, 'ml', 'data.csv'),
+            os.path.join(project_root, 'ml', 'DATA_FINAL.csv'),
+            os.path.join(backend_dir, 'data', 'DATA_FINAL.csv'),
+            os.path.join(backend_dir, 'data', 'data.csv'),
             'backend/data/DATA_FINAL.csv',
             'data/DATA_FINAL.csv',
             '../ml/data.csv',
-            'backend/data/data.csv',
-            '/home/bneay/Industrial-Copilot/ml/data.csv',
-            '/home/bneay/Industrial-Copilot/backend/data/DATA_FINAL.csv'
+            'ml/data.csv'
         ]
         
         for path in possible_paths:
             if os.path.exists(path):
+                print(f"📂 Found data file at: {path}")
                 return path
         
-        # Default to data.csv
-        return '/home/bneay/Industrial-Copilot/ml/data.csv'
+        # Return the most likely path even if it doesn't exist
+        # (will trigger dummy data generation)
+        print(f"⚠️ No data file found, will use synthetic data")
+        return os.path.join(project_root, 'ml', 'data.csv')
     
     def load_data(self):
         """Load CSV data"""

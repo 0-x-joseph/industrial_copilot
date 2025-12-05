@@ -176,7 +176,7 @@ export const SteamGauge: React.FC<SteamGaugeProps> = ({ data, isLoading }) => {
           {/* Alert message */}
           {data.pressure_alert && (
             <div className="mt-4 flex items-start gap-2 p-3 bg-[#E86C5D]/10 border border-[#E86C5D]/30 rounded-lg">
-              <Icon name="warning" size={16} color="secondary" />
+              <Icon name="dot" size={16} color="secondary" />
               <div className="text-sm">
                 <div className="text-[#E86C5D] font-semibold">Low Pressure Alert</div>
                 <div className="text-[#8E9098] text-xs mt-1">

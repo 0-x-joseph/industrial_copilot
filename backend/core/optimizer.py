@@ -669,10 +669,17 @@ def load_sulfur_data(filepath: str = None) -> Optional[pd.DataFrame]:
     import os
     
     if filepath is None:
-        # Try default locations
+        # Get the directory where this file is located
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        backend_dir = os.path.dirname(current_dir)  # backend/
+        project_root = os.path.dirname(backend_dir)  # project root
+        
+        # Try default locations with absolute paths
         possible_paths = [
-            '/home/bneay/Industrial-Copilot/backend/data/DATA_FINAL.csv',
-            '/home/bneay/Industrial-Copilot/ml/data.csv',
+            os.path.join(project_root, 'ml', 'data.csv'),
+            os.path.join(project_root, 'ml', 'DATA_FINAL.csv'),
+            os.path.join(backend_dir, 'data', 'DATA_FINAL.csv'),
+            os.path.join(backend_dir, 'data', 'data.csv'),
             'backend/data/DATA_FINAL.csv',
             'ml/data.csv'
         ]
