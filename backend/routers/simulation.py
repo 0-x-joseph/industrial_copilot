@@ -91,6 +91,23 @@ class CostBreakdown(BaseModel):
     gta_fuel: float = Field(description="GTA fuel cost (DH/hr)")
 
 
+class OperationalRecommendation(BaseModel):
+    """Structured operational command with safety checks"""
+    icon: str
+    title: str
+    instruction: str
+    safety_check: Optional[str] = None
+    impact: str
+    priority: str  # high, medium, low
+
+
+class BaselineComparison(BaseModel):
+    """Baseline scenario for comparison"""
+    grid_import: float = Field(description="Baseline grid import (MW)")
+    boiler_output: float = Field(description="Baseline boiler output (T/hr)")
+    gta_load_percent: float = Field(description="Baseline GTA load (%)")
+
+
 class OptimizationResponse(BaseModel):
     """Response model for optimization endpoint"""
     
@@ -102,7 +119,9 @@ class OptimizationResponse(BaseModel):
     total_cost: float = Field(description="Total operating cost (DH/hr)")
     cost_breakdown: CostBreakdown = Field(description="Detailed cost breakdown")
     baseline_cost: float = Field(description="Cost with naive strategy (DH/hr)")
+    baseline: BaselineComparison = Field(description="Baseline scenario details")
     savings: float = Field(description="Cost savings vs baseline (DH/hr)")
+    recommendations: List[OperationalRecommendation] = Field(description="Structured operational commands with safety checks")
     demands: Dict[str, float] = Field(description="Input demands")
     constraints_applied: Dict[str, Any] = Field(description="Applied constraints")
     timestamp: str = Field(description="Optimization timestamp")
@@ -167,7 +186,9 @@ async def optimize_dispatch(request: OptimizationRequest):
             total_cost=result['total_cost'],
             cost_breakdown=CostBreakdown(**result['cost_breakdown']),
             baseline_cost=result['baseline_cost'],
+            baseline=BaselineComparison(**result['baseline']),
             savings=result['savings'],
+            recommendations=[OperationalRecommendation(**rec) for rec in result['recommendations']],
             demands=result['demands'],
             constraints_applied=result['constraints_applied'],
             timestamp=datetime.now().isoformat()

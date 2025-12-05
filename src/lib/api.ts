@@ -23,6 +23,21 @@ export interface CostBreakdown {
   gta_fuel: number;
 }
 
+export interface BaselineComparison {
+  grid_import: number;
+  boiler_output: number;
+  gta_load_percent: number;
+}
+
+export interface OperationalRecommendation {
+  icon: string;
+  title: string;
+  instruction: string;
+  safety_check?: string;
+  impact: string;
+  priority: 'high' | 'medium' | 'low';
+}
+
 export interface OptimizationResult {
   status: string;
   gtas: GTAResult[];
@@ -32,7 +47,9 @@ export interface OptimizationResult {
   total_cost: number;
   cost_breakdown: CostBreakdown;
   baseline_cost: number;
+  baseline: BaselineComparison;
   savings: number;
+  recommendations: OperationalRecommendation[];
   demands: {
     electricity: number;
     steam: number;

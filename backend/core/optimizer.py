@@ -109,6 +109,225 @@ class EnergyOptimizer:
         
         return max(0, power)  # Power cannot be negative
     
+    def _generate_recommendations(
+        self, 
+        gtas, 
+        grid_import, 
+        boiler_output, 
+        sulfur_steam_used,
+        baseline_grid, 
+        baseline_boiler, 
+        grid_cost, 
+        savings,
+        elec_demand,
+        steam_demand,
+        hour
+    ) -> list:
+        """
+        Generate expert operational commands with safety checks and actionable instructions
+        
+        Returns:
+            List of structured recommendation dicts with:
+            - icon: Visual indicator
+            - title: Command headline
+            - instruction: Specific operational action
+            - safety_check: Critical safety monitoring requirement (optional)
+            - impact: Financial/operational benefit
+            - priority: high/medium/low
+        """
+        recommendations = []
+        
+        # Determine time period
+        if 17 <= (hour or 14) < 22:
+            period = "Peak"
+            period_icon = "🔴"
+            is_peak = True
+        elif 7 <= (hour or 14) < 17:
+            period = "Standard"
+            period_icon = "🟡"
+            is_peak = False
+        else:
+            period = "Off-Peak"
+            period_icon = "🟢"
+            is_peak = False
+        
+        # === PRIORITY 1: FINANCIAL IMPACT HEADER ===
+        if savings > 100:
+            recommendations.append({
+                'icon': '💰',
+                'title': 'Optimization Savings Identified',
+                'instruction': f'Total potential savings: {savings:,.0f} DH/hr ({savings*8760:,.0f} DH/year) vs baseline operation.',
+                'impact': f'+{savings:,.0f} DH/hr',
+                'priority': 'high'
+            })
+        
+        # === BRANCH 1: MAX EFFICIENCY (Pushing GTAs Hard) ===
+        for gta in gtas:
+            if gta['power'] > 0.1 and gta['admission'] > 175:
+                # High admission - near capacity
+                vacuum_warning = "⚠️ Monitor Condenser Vacuum: High flow may degrade vacuum. Ensure Sea Water Pumps are running at full capacity."
+                recommendations.append({
+                    'icon': '⚙️',
+                    'title': f'Push GTA {gta["gta_number"]} to Capacity',
+                    'instruction': f'Increase Admission Valve setpoint to {gta["admission"]:.1f} T/h. Ramp slowly over 5 minutes to avoid thermal shock.',
+                    'safety_check': vacuum_warning,
+                    'impact': f'{gta["power"]:.1f} MW generation',
+                    'priority': 'high'
+                })
+            elif gta['power'] > 0.1 and gta['admission'] > 1:
+                # Normal operation
+                recommendations.append({
+                    'icon': '⚙️',
+                    'title': f'Adjust GTA {gta["gta_number"]} Setpoint',
+                    'instruction': f'Set Admission to {gta["admission"]:.1f} T/h and Soutirage to {gta["soutirage"]:.1f} T/h. Monitor ramp rate.',
+                    'impact': f'{gta["power"]:.1f} MW, {gta["soutirage"]:.1f} T/h steam',
+                    'priority': 'medium'
+                })
+        
+        # === BRANCH 2: BOILER KILL (Cost Saving) ===
+        if baseline_boiler > 10 and boiler_output < 1:
+            boiler_savings = baseline_boiler * FINANCIAL.BOILER_COST
+            recommendations.append({
+                'icon': '🛑',
+                'title': 'Shutdown Auxiliary Boiler',
+                'instruction': 'Ramp down Boiler firing rate to 0 over 10 minutes. Switch steam supply to Sulfur Recovery + GTA extraction.',
+                'safety_check': '✅ Pressure Watch: Verify MP Header maintains > 8.5 bar on Sulfur steam alone. Install pressure transmitter PT-201 as backup.',
+                'impact': f'Saves {boiler_savings:,.0f} DH/hr (284 DH/T fuel avoided)',
+                'priority': 'high'
+            })
+        elif boiler_output > 10:
+            # Boiler running - expensive
+            boiler_cost = boiler_output * FINANCIAL.BOILER_COST
+            recommendations.append({
+                'icon': '⚠️',
+                'title': 'Expensive Steam Source Active',
+                'instruction': f'Auxiliary Boiler running at {boiler_output:.1f} T/h. Consider increasing GTA extraction or sulfur recovery to reduce boiler load.',
+                'impact': f'{boiler_cost:,.0f} DH/hr cost (284 DH/T)',
+                'priority': 'medium'
+            })
+        
+        # === BRANCH 3: PEAK AVOIDANCE (Grid Cost) ===
+        if is_peak and grid_import > 10:
+            import_cost = grid_import * grid_cost * 1000
+            recommendations.append({
+                'icon': '⚡',
+                'title': 'Peak Tariff Alert (1.271 DH/kWh)',
+                'instruction': f'Maximize internal generation. Current grid import: {grid_import:.1f} MW. If GTAs are maxed out, request load shedding from Downstream Plants (CAP, PTE).',
+                'safety_check': '⚠️ Coordination Required: Notify production planning before load reduction.',
+                'impact': f'Current import costing {import_cost:,.0f} DH/hr at peak rate',
+                'priority': 'high'
+            })
+        elif is_peak and grid_import < 10:
+            recommendations.append({
+                'icon': '✅',
+                'title': 'Peak Shaving Successful',
+                'instruction': f'Grid import minimized to {grid_import:.1f} MW during peak hours. Maintain current GTA loading.',
+                'impact': f'Avoiding expensive peak charges',
+                'priority': 'low'
+            })
+        
+        # === BRANCH 4: GRID OPTIMIZATION ===
+        grid_reduction = baseline_grid - grid_import
+        if grid_reduction > 5:
+            cost_avoided = grid_reduction * grid_cost * 1000
+            recommendations.append({
+                'icon': '✅',
+                'title': 'Grid Import Optimized',
+                'instruction': f'Reduced grid dependency by {grid_reduction:.1f} MW through optimal GTA dispatch.',
+                'impact': f'{cost_avoided:,.0f} DH/hr savings',
+                'priority': 'medium'
+            })
+        elif grid_import > 90:
+            # Near grid limit
+            recommendations.append({
+                'icon': '🔴',
+                'title': 'Grid Capacity Warning',
+                'instruction': f'Grid import at {grid_import:.1f} MW (near {SYSTEM.MAX_GRID_IMPORT} MW substation limit). Increase GTA generation immediately.',
+                'safety_check': '⚠️ Risk of circuit breaker trip if exceeded. Contact electrical substation operator.',
+                'impact': 'Critical capacity issue',
+                'priority': 'high'
+            })
+        
+        # === BRANCH 5: PRESSURE SAFETY ===
+        total_steam = sulfur_steam_used + sum(g['soutirage'] for g in gtas) + boiler_output
+        steam_ratio = total_steam / steam_demand if steam_demand > 0 else 1
+        estimated_pressure = 7 + (steam_ratio * 2)  # Rough estimate
+        
+        if estimated_pressure < 8.5:
+            recommendations.append({
+                'icon': '⚠️',
+                'title': 'MP Pressure Risk',
+                'instruction': f'Predicted MP pressure: {estimated_pressure:.1f} bar (below 8.5 bar minimum). Increase steam production immediately.',
+                'safety_check': '🔴 GTA Trip Risk: Low MP pressure may cause turbine protective trip. Monitor PI-150 continuously.',
+                'impact': 'Process reliability at risk',
+                'priority': 'high'
+            })
+        elif estimated_pressure > 8.5:
+            recommendations.append({
+                'icon': '✅',
+                'title': 'Process Reliability: Stable',
+                'instruction': f'MP Header pressure stable at {estimated_pressure:.1f} bar (above 8.5 bar minimum).',
+                'impact': 'Safe operation confirmed',
+                'priority': 'low'
+            })
+        
+        # === BRANCH 6: SULFUR RECOVERY UTILIZATION ===
+        if sulfur_steam_used > 70:
+            recommendations.append({
+                'icon': '♻️',
+                'title': 'Free Steam Maximized',
+                'instruction': f'Utilizing {sulfur_steam_used:.1f} T/h from Sulfur Recovery (essentially free at 20 DH/T). Maintain sulfur plant operations.',
+                'impact': 'Base load steam secured',
+                'priority': 'low'
+            })
+        
+        # === BRANCH 7: CAPACITY ALERTS ===
+        active_gtas = [g for g in gtas if g['power'] > 1]
+        if len(active_gtas) == 0:
+            recommendations.append({
+                'icon': '🔴',
+                'title': 'No GTAs Running',
+                'instruction': 'Start at least one GTA to enable cogeneration and reduce grid dependency.',
+                'safety_check': '⚠️ Startup Procedure: Follow GTA startup checklist. Verify HP steam availability before admission valve opening.',
+                'impact': 'Missing cogeneration opportunity',
+                'priority': 'high'
+            })
+        
+        total_power = sum(g['power'] for g in gtas) + grid_import
+        if elec_demand > SYSTEM.MAX_TOTAL_POWER_PRODUCTION:
+            power_deficit = elec_demand - SYSTEM.MAX_TOTAL_POWER_PRODUCTION
+            recommendations.append({
+                'icon': '🔴',
+                'title': 'Demand Exceeds Plant Capacity',
+                'instruction': f'Electrical demand {elec_demand:.0f} MW exceeds maximum capacity {SYSTEM.MAX_TOTAL_POWER_PRODUCTION:.0f} MW. Implement load shedding of {power_deficit:.0f} MW.',
+                'safety_check': '⚠️ Emergency Protocol: Contact production manager for non-critical load shutdown authorization.',
+                'impact': 'Infeasible operation',
+                'priority': 'high'
+            })
+        
+        if steam_demand > SYSTEM.MAX_TOTAL_STEAM_PRODUCTION:
+            steam_deficit = steam_demand - SYSTEM.MAX_TOTAL_STEAM_PRODUCTION
+            recommendations.append({
+                'icon': '🔴',
+                'title': 'Steam Demand Infeasible',
+                'instruction': f'Steam demand {steam_demand:.0f} T/h exceeds plant capacity {SYSTEM.MAX_TOTAL_STEAM_PRODUCTION:.0f} T/h. Reduce demand by {steam_deficit:.0f} T/h.',
+                'impact': 'Physical constraint violation',
+                'priority': 'high'
+            })
+        
+        # === BRANCH 8: TIME-BASED OPERATIONS ===
+        if (hour or 14) >= 22 or (hour or 14) < 7:
+            # Off-peak hours - opportunity
+            recommendations.append({
+                'icon': '🟢',
+                'title': 'Off-Peak Advantage Active',
+                'instruction': f'Grid electricity at {grid_cost} DH/kWh (cheapest rate). Optimal time for energy-intensive operations.',
+                'impact': 'Favorable tariff window',
+                'priority': 'low'
+            })
+        
+        return recommendations
+    
     def optimize(
         self,
         elec_demand: float,
@@ -159,10 +378,10 @@ class EnergyOptimizer:
         for i in [1, 2, 3]:
             A[i] = pulp.LpVariable(f"Admission_GTA{i}", 
                                    lowBound=PHYSICS.MIN_ADMISSION,
-                                   upBound=PHYSICS.MAX_ADMISSION)
+                                   upBound=PHYSICS.MAX_ADMISSION)  # 0-190 T/hr
             S[i] = pulp.LpVariable(f"Soutirage_GTA{i}", 
                                    lowBound=PHYSICS.MIN_SOUTIRAGE,
-                                   upBound=PHYSICS.MAX_ADMISSION)
+                                   upBound=PHYSICS.MAX_SOUTIRAGE)  # 0-100 T/hr
         
         # Auxiliary systems
         F_boiler = pulp.LpVariable("Boiler_Steam", 
@@ -332,11 +551,38 @@ class EnergyOptimizer:
         total_cost_value = (actual_cost_grid + actual_cost_boiler + 
                           actual_cost_sulfur + actual_cost_gta)
         
-        # Calculate baseline (naive strategy: maximize boiler + grid)
-        baseline_cost = (elec_demand * grid_cost * 1000 + 
-                        steam_demand * FINANCIAL.BOILER_COST)
+        # Calculate baseline (naive strategy: 50% GTA load, rest from boiler/grid)
+        baseline_gta_load = 0.5  # 50% of max capacity
+        baseline_gta_admission = PHYSICS.MAX_ADMISSION * baseline_gta_load * 3  # 3 GTAs
+        baseline_gta_power = sum(
+            (PHYSICS.get_gta_coefficients(i)['coef_a'] * (PHYSICS.MAX_ADMISSION * baseline_gta_load) +
+             PHYSICS.get_gta_coefficients(i)['intercept'])
+            for i in [1, 2, 3]
+        )
+        baseline_grid_import = max(0, elec_demand - baseline_gta_power)
+        baseline_boiler_steam = max(0, steam_demand - max_sulfur - (PHYSICS.MAX_ADMISSION * baseline_gta_load * 3 * 0.3))  # Assume 30% extraction
+        
+        baseline_cost = (baseline_grid_import * grid_cost * 1000 + 
+                        baseline_boiler_steam * FINANCIAL.BOILER_COST +
+                        max_sulfur * FINANCIAL.SULFURIC_HEAT_COST +
+                        baseline_gta_admission * FINANCIAL.GTA_FUEL_COST * 100)
         
         savings = baseline_cost - total_cost_value
+        
+        # Generate recommendations
+        recommendations = self._generate_recommendations(
+            gtas=gtas,
+            grid_import=grid_import,
+            boiler_output=boiler_output,
+            sulfur_steam_used=sulfur_steam_used,
+            baseline_grid=baseline_grid_import,
+            baseline_boiler=baseline_boiler_steam,
+            grid_cost=grid_cost,
+            savings=savings,
+            elec_demand=elec_demand,
+            steam_demand=steam_demand,
+            hour=hour
+        )
         
         # Store solution
         self.last_solution = {
@@ -353,12 +599,18 @@ class EnergyOptimizer:
             },
             'status': status,
             'baseline_cost': round(baseline_cost, 2),
+            'baseline': {
+                'grid_import': round(baseline_grid_import, 2),
+                'boiler_output': round(baseline_boiler_steam, 2),
+                'gta_load_percent': baseline_gta_load * 100
+            },
             'savings': round(savings, 2),
             'demands': {
                 'electricity': elec_demand,
                 'steam': steam_demand
             },
-            'constraints_applied': constraints or {}
+            'constraints_applied': constraints or {},
+            'recommendations': recommendations
         }
         
         if verbose:
